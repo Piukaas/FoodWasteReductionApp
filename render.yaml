@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: foodwaste-app
+    env: docker
+    buildCommand: docker build -t foodwaste-app .
+    startCommand: docker run -p $PORT:80 foodwaste-app
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
