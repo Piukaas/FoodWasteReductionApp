@@ -26,12 +26,8 @@ jobs:
 
       - name: Apply database migrations
         run: |
-          dotnet ef database update --project FoodWasteReduction.Infrastructure/FoodWasteReduction.Infrastructure.csproj --startup-project FoodWasteReduction.Api/FoodWasteReduction.Api.csproj --context ApplicationDbContext
-          dotnet ef database update --project FoodWasteReduction.Infrastructure/FoodWasteReduction.Infrastructure.csproj --startup-project FoodWasteReduction.Api/FoodWasteReduction.Api.csproj --context ApplicationIdentityDbContext
-        env:
-          ConnectionStrings__DefaultConnection: ${{ secrets.AZURE_SQL_CONNECTION_STRING }}
-          ConnectionStrings__IdentityConnection: ${{ secrets.AZURE_SQL_IDENTITY_CONNECTION_STRING }}
-
+          dotnet ef database update --project FoodWasteReduction.Infrastructure/FoodWasteReduction.Infrastructure.csproj --startup-project FoodWasteReduction.Api/FoodWasteReduction.Api.csproj --context ApplicationDbContext --connection "${{ secrets.AZURE_SQL_CONNECTION_STRING }}"
+          dotnet ef database update --project FoodWasteReduction.Infrastructure/FoodWasteReduction.Infrastructure.csproj --startup-project FoodWasteReduction.Api/FoodWasteReduction.Api.csproj --context ApplicationIdentityDbContext --connection "${{ secrets.AZURE_SQL_IDENTITY_CONNECTION_STRING }}"
       - name: dotnet publish API
         run: dotnet publish FoodWasteReduction.Api/FoodWasteReduction.Api.csproj -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
