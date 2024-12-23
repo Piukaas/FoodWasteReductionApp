@@ -28,20 +28,17 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
-    app.UseSwagger();
-    app.UseSwaggerUI(c => 
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "FoodWasteReduction API v1");
-        c.RoutePrefix = string.Empty;  // Serve the Swagger UI at the root
-    });
 }
 
-// Comment out or remove this line to disable HTTPS redirection
-// app.UseHttpsRedirection();
+app.UseSwagger();
+app.UseSwaggerUI(c => 
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "FoodWasteReduction API v1");
+    c.RoutePrefix = string.Empty;  // Serve the Swagger UI at the root
+});
 
 app.UseRouting();
 app.UseAuthorization();
