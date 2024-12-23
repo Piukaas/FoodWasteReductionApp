@@ -1,6 +1,3 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
 name: Build and deploy ASP.Net Core app to Azure Web App - foodwaste-api-app
 
 on:
@@ -12,20 +9,30 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.x'
+          dotnet-version: "8.x"
 
       - name: Build with dotnet
-        run: dotnet build --configuration Release
+        run: dotnet build FoodWasteReduction.Api/FoodWasteReduction.Api.csproj --configuration Release
 
-      - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+      # Add EF Core migrations
+      - name: Install EF Core CLI
+        run: dotnet tool install --global dotnet-ef
+
+      - name: Apply database migrations
+        run: |
+          dotnet ef database update --project FoodWasteReduction.Infrastructure/FoodWasteReduction.Infrastructure.csproj --startup-project FoodWasteReduction.Api/FoodWasteReduction.Api.csproj
+        env:
+          ConnectionStrings__DefaultConnection: ${{ secrets.AZURE_SQL_CONNECTION_STRING }}
+          ConnectionStrings__IdentityConnection: ${{ secrets.AZURE_SQL_IDENTITY_CONNECTION_STRING }}
+
+      - name: dotnet publish API
+        run: dotnet publish FoodWasteReduction.Api/FoodWasteReduction.Api.csproj -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -37,20 +44,20 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     environment:
-      name: 'Production'
+      name: "Production"
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    
+
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: .net-app
-      
+
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'foodwaste-api-app'
-          slot-name: 'Production'
+          app-name: "foodwaste-api-app"
+          slot-name: "Production"
           package: .
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_B7241B8CDB7B47E587455605567E1EB9 }}
