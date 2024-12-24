@@ -17,16 +17,19 @@ jobs:
         with:
           dotnet-version: "8.x"
 
-      # Build Projects
+        # Build Projects
       - name: Build API
         run: dotnet build FoodWasteReduction.Api/FoodWasteReduction.Api.csproj --configuration Release
 
       - name: Build Web App
         run: dotnet build FoodWasteReduction.Web/FoodWasteReduction.Web.csproj --configuration Release
 
+      - name: Build Tests
+        run: dotnet build FoodWasteReduction.Tests/FoodWasteReduction.Tests.csproj --configuration Release
+
       # Run Tests
-      - name: Test API
-        run: dotnet test FoodWasteReduction.Tests/FoodWasteReduction.Tests.csproj --no-build --verbosity normal
+      - name: Test
+        run: dotnet test FoodWasteReduction.Tests/FoodWasteReduction.Tests.csproj --configuration Release --no-build --verbosity normal
 
       # Database Migrations
       - name: Install EF Core CLI
