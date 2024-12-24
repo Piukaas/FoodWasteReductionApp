@@ -6,15 +6,19 @@ namespace FoodWasteReduction.Web.Controllers
     public class AuthController : Controller
     {
         private readonly IAuthService _authService;
+        private readonly IAuthGuardService _authGuardService;
 
-        public AuthController(IAuthService authService)
+        public AuthController(IAuthService authService, IAuthGuardService authGuardService)
         {
             _authService = authService;
+            _authGuardService = authGuardService;
         }
 
         [HttpGet]
         public IActionResult Login()
         {
+            if (_authGuardService.IsAuthenticated)
+                return RedirectToAction("Index", "Home");
             return View();
         }
 
@@ -24,12 +28,22 @@ namespace FoodWasteReduction.Web.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            var result = await _authService.Login(model);
-            if (result)
+            var (success, token) = await _authService.Login(model);
+            if (success)
+            {
+                _authGuardService.SetToken(token);
                 return RedirectToAction("Index", "Home");
+            }
 
             ModelState.AddModelError(string.Empty, "Invalid login attempt");
             return View(model);
+        }
+
+        [HttpPost]
+        public IActionResult Logout()
+        {
+            _authGuardService.ClearToken();
+            return RedirectToAction("Index", "Home");
         }
 
         [HttpGet]

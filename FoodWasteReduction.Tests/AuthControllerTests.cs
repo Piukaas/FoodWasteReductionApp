@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -22,6 +23,7 @@ namespace FoodWasteReduction.Tests.Controllers
         private readonly Mock<SignInManager<ApplicationUser>> _mockSignInManager;
         private readonly ApplicationDbContext _context;
         private readonly AuthController _controller;
+        private readonly Mock<IConfiguration> _mockConfiguration;
 
         public AuthControllerTests()
         {
@@ -69,10 +71,20 @@ namespace FoodWasteReduction.Tests.Controllers
                 .Options;
 
             _context = new ApplicationDbContext(dbContextOptions);
+
+            _mockConfiguration = new Mock<IConfiguration>();
+            _mockConfiguration
+                .SetupGet(x => x["Jwt:Key"])
+                .Returns("YourSuperSecretKey1234567890123456");
+            _mockConfiguration.SetupGet(x => x["Jwt:Issuer"]).Returns("FoodWasteReductionApp");
+            _mockConfiguration.SetupGet(x => x["Jwt:Audience"]).Returns("http://localhost:5019");
+            _mockConfiguration.SetupGet(x => x["Jwt:ExpireMinutes"]).Returns("30");
+
             _controller = new AuthController(
                 _mockUserManager.Object,
                 _mockSignInManager.Object,
-                _context
+                _context,
+                _mockConfiguration.Object
             );
         }
 
@@ -162,7 +174,8 @@ namespace FoodWasteReduction.Tests.Controllers
             // Assert
             var badRequestResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
             var modelState = badRequestResult.Value as SerializableError;
-            modelState[string.Empty]
+            modelState!
+                [string.Empty]
                 .As<string[]>()
                 .Should()
                 .Contain(x => x.Contains("16 years") && x.Contains("future"));
@@ -262,6 +275,7 @@ namespace FoodWasteReduction.Tests.Controllers
 
             var user = new Student
             {
+                Id = "123",
                 Email = "test@example.com",
                 Name = "Test User",
                 StudentNumber = "S123456",
@@ -298,7 +312,10 @@ namespace FoodWasteReduction.Tests.Controllers
             userInfo.Should().NotBeNull();
             userInfo.Should().ContainKey("Email");
             userInfo["Email"].GetString().Should().Be("test@example.com");
+            userInfo.Should().ContainKey("Name");
             userInfo["Name"].GetString().Should().Be("Test User");
+            userInfo.Should().ContainKey("DateOfBirth");
+            userInfo["DateOfBirth"].GetDateTime().Should().Be(user.DateOfBirth);
 
             var roles = userInfo["Roles"].EnumerateArray().Select(r => r.GetString()).ToList();
             roles.Should().NotBeNull();
