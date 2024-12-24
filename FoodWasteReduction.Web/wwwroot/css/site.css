@@ -8,7 +8,11 @@ html {
   }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
@@ -18,5 +22,115 @@ html {
 }
 
 body {
+  font-family: "Quicksand", sans-serif;
+  background-color: #d8d3cd;
+  color: black;
   margin-bottom: 60px;
+}
+
+.control-label {
+  font-weight: bold;
+}
+
+.form-control {
+  background-color: #eeeeee;
+  border-radius: 25px;
+  border: 2px solid black;
+  color: black;
+}
+
+.form-control:focus {
+  border-color: #2a6f82;
+  box-shadow: 0 0 0 0.25rem rgba(42, 111, 130, 0.5);
+  outline: 0;
+}
+
+.form-select:focus {
+  border-color: #2a6f82;
+  box-shadow: 0 0 0 0.25rem rgba(42, 111, 130, 0.5);
+  outline: 0;
+}
+
+.text-danger,
+.bold {
+  font-weight: bold;
+}
+
+.btn {
+  border-radius: 25px;
+}
+
+.btn-primary {
+  background-color: #2a6f82;
+  border-color: #2a6f82;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #1d4f5d;
+  border-color: #1d4f5d;
+  color: white;
+}
+
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+  background-color: #2a6f82;
+  border-color: #2a6f82;
+  color: white;
+}
+
+.nav-link {
+  color: black !important;
+}
+
+.nav-link:hover {
+  color: #2a6f82 !important;
+  text-decoration: underline;
+}
+
+a.btn-link {
+  color: #2a6f82 !important;
+  font-weight: bold;
+}
+
+a.btn-link:hover {
+  color: #1d4f5d !important;
+}
+
+.dropdown-menu {
+  background-color: #d8d3cd;
+  border: 2px solid black;
+  border-radius: 15px;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+  background-color: #2a6f82;
+  color: white;
+}
+
+.dropdown-menu .dropdown-item {
+  padding: 0.5rem 1rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.navbar {
+  background-color: #c0a78b !important;
+  border-bottom: 2px solid black !important;
+  color: black !important;
+  border-bottom-left-radius: 10px !important;
+  border-bottom-right-radius: 10px !important;
+}
+
+.footer {
+  background-color: #c0a78b !important;
+  border-top: 2px solid black !important;
+  color: black !important;
+  border-top-left-radius: 10px !important;
+  border-top-right-radius: 10px !important;
+}
+
+.navbar-logo {
+  height: 30px;
+  margin-right: 10px;
 }

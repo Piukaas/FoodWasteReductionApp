@@ -4,33 +4,33 @@ namespace FoodWasteReduction.Web.Models.Auth
 {
     public class RegisterCanteenStaffViewModel
     {
-        [Required]
-        [EmailAddress]
-        [Display(Name = "Email")]
+        [Required(ErrorMessage = "E-mail is verplicht")]
+        [EmailAddress(ErrorMessage = "Ongeldig e-mailadres")]
+        [Display(Name = "E-mail")]
         public string Email { get; set; } = string.Empty;
 
-        [Required]
-        [Display(Name = "Name")]
+        [Required(ErrorMessage = "Naam is verplicht")]
+        [Display(Name = "Naam")]
         public string Name { get; set; } = string.Empty;
 
-        [Required]
-        [Display(Name = "Personnel Number")]
+        [Required(ErrorMessage = "Personeelsnummer is verplicht")]
+        [Display(Name = "Personeelsnummer")]
         public string PersonnelNumber { get; set; } = string.Empty;
 
-        [Required]
-        [Display(Name = "Location")]
+        [Required(ErrorMessage = "Locatie is verplicht")]
+        [Display(Name = "Locatie")]
         public string Location { get; set; } = string.Empty;
 
-        [Required]
-        [MinLength(8, ErrorMessage = "Password must be at least 8 characters")]
+        [Required(ErrorMessage = "Wachtwoord is verplicht")]
+        [MinLength(8, ErrorMessage = "Wachtwoord moet tenminste 8 karakters bevatten")]
         [DataType(DataType.Password)]
-        [Display(Name = "Password")]
+        [Display(Name = "Wachtwoord")]
         public string Password { get; set; } = string.Empty;
 
-        [Required]
-        [Compare(nameof(Password), ErrorMessage = "Passwords do not match")]
+        [Required(ErrorMessage = "Bevestig je wachtwoord")]
+        [Compare(nameof(Password), ErrorMessage = "Wachtwoorden komen niet overeen")]
         [DataType(DataType.Password)]
-        [Display(Name = "Confirm Password")]
+        [Display(Name = "Bevestig wachtwoord")]
         public string ConfirmPassword { get; set; } = string.Empty;
     }
 }

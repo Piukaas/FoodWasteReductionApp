@@ -72,6 +72,7 @@ namespace FoodWasteReduction.Api.Controllers
                 StudentNumber = model.StudentNumber,
                 DateOfBirth = model.DateOfBirth,
                 StudyCity = model.StudyCity,
+                PhoneNumber = model.PhoneNumber,
             };
 
             using var transaction = await _applicationDbContext.Database.BeginTransactionAsync();

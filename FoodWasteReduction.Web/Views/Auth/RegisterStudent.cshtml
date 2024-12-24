@@ -1,7 +1,7 @@
 @model RegisterStudentViewModel
 
 @{
-    ViewData["Title"] = "Register Student";
+    ViewData["Title"] = "Registreer student";
 }
 
 <div class="row justify-content-center">
@@ -9,7 +9,7 @@
         <h2 class="text-center mb-4">@ViewData["Title"]</h2>
         <form asp-action="RegisterStudent" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            
+
             <div class="form-group mb-3">
                 <label asp-for="Email" class="control-label"></label>
                 <input asp-for="Email" class="form-control" autocomplete="email" />
@@ -30,7 +30,8 @@
 
             <div class="form-group mb-3">
                 <label asp-for="DateOfBirth" class="control-label"></label>
-                <input asp-for="DateOfBirth" class="form-control" type="date" />
+                <input asp-for="DateOfBirth" class="form-control" type="date"
+                    max="@DateTime.Now.ToString("yyyy-MM-dd")" />
                 <span asp-validation-for="DateOfBirth" class="text-danger"></span>
             </div>
 
@@ -38,6 +39,12 @@
                 <label asp-for="StudyCity" class="control-label"></label>
                 <input asp-for="StudyCity" class="form-control" />
                 <span asp-validation-for="StudyCity" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="PhoneNumber" class="control-label"></label>
+                <input asp-for="PhoneNumber" class="form-control" />
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
             </div>
 
             <div class="form-group mb-3">
@@ -53,16 +60,18 @@
             </div>
 
             <div class="form-group d-grid mb-3">
-                <button type="submit" class="btn btn-primary">Register</button>
+                <button type="submit" class="btn btn-primary">Registreer</button>
             </div>
 
-            <div class="text-center">
-                <p>Already have an account? <a asp-action="Login">Login here</a></p>
+            <div class="text-center bold">
+                <p>Al een account? <a class="btn-link" asp-action="Login">Inloggen</a></p>
             </div>
         </form>
     </div>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

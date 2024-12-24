@@ -1,7 +1,7 @@
 @model LoginViewModel
 
 @{
-    ViewData["Title"] = "Login";
+    ViewData["Title"] = "Inloggen";
 }
 
 <div class="row justify-content-center">
@@ -23,13 +23,13 @@
             </div>
 
             <div class="form-group d-grid">
-                <button type="submit" class="btn btn-primary">Login</button>
+                <button type="submit" class="btn btn-primary">Inloggen</button>
             </div>
 
-            <div class="text-center mt-3">
-                <p>Don't have an account? Register as:</p>
+            <div class="text-center bold mt-3">
+                <p>Geen account? Registreer als:</p>
                 <a asp-action="RegisterStudent" class="btn btn-link">Student</a> |
-                <a asp-action="RegisterCanteenStaff" class="btn btn-link">Canteen Staff</a>
+                <a asp-action="RegisterCanteenStaff" class="btn btn-link">Kantinemedewerker</a>
             </div>
         </form>
     </div>

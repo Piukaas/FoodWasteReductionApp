@@ -25,5 +25,9 @@ namespace FoodWasteReduction.Core.DTOs.Auth
         [Required]
         [MinLength(8)]
         public string Password { get; set; } = string.Empty;
+
+        [Required]
+        [Phone]
+        public string PhoneNumber { get; set; } = string.Empty;
     }
 }

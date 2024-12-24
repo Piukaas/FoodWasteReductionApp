@@ -17,7 +17,7 @@ namespace FoodWasteReduction.Tests
                 StudentNumber = "S123456",
                 Email = "john.doe@example.com",
                 StudyCity = "New York",
-                PhoneNumber = "123-456-7890"
+                PhoneNumber = "123-456-7890",
             };
 
             // Act & Assert

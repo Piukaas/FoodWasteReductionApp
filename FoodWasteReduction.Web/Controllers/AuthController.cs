@@ -68,7 +68,7 @@ namespace FoodWasteReduction.Web.Controllers
             if (result)
                 return RedirectToAction(nameof(Login));
 
-            ModelState.AddModelError(string.Empty, "Registration failed");
+            ModelState.AddModelError(string.Empty, "Registratie gefaald");
             return View(model);
         }
 
@@ -88,7 +88,7 @@ namespace FoodWasteReduction.Web.Controllers
             if (result)
                 return RedirectToAction(nameof(Login));
 
-            ModelState.AddModelError(string.Empty, "Registration failed");
+            ModelState.AddModelError(string.Empty, "Registratie gefaald");
             return View(model);
         }
 
