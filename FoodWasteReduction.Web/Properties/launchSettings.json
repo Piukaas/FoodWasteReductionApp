@@ -34,5 +34,11 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     }
+  },
+  "ApiSettings": {
+    "BaseUrl": {
+      "Development": "https://localhost:5019/api",
+      "Production": "https://foodwaste-api-app-h4crb9bkbzemaqcs.westeurope-01.azurewebsites.net"
+    }
   }
 }

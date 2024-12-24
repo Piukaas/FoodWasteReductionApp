@@ -27,6 +27,7 @@ namespace FoodWasteReduction.Api.Controllers
             _applicationDbContext = applicationDbContext;
         }
 
+        [HttpPost("register/student")]
         public async Task<IActionResult> RegisterStudent(RegisterStudentDto model)
         {
             if (!ModelState.IsValid)
