@@ -1,5 +1,6 @@
 using FoodWasteReduction.Web.Models.Auth;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace FoodWasteReduction.Web.Controllers
 {
@@ -28,10 +29,13 @@ namespace FoodWasteReduction.Web.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            var (success, token) = await _authService.Login(model);
+            var (success, token, userData) = await _authService.Login(model);
             if (success)
             {
                 _authGuardService.SetToken(token);
+                HttpContext.Session.SetString("JWTToken", token);
+                HttpContext.Session.SetString("UserData", JsonConvert.SerializeObject(userData));
+
                 return RedirectToAction("Index", "Home");
             }
 
@@ -43,6 +47,8 @@ namespace FoodWasteReduction.Web.Controllers
         public IActionResult Logout()
         {
             _authGuardService.ClearToken();
+            HttpContext.Session.Remove("JWTToken");
+            HttpContext.Session.Remove("UserData");
             return RedirectToAction("Index", "Home");
         }
 
@@ -84,6 +90,12 @@ namespace FoodWasteReduction.Web.Controllers
 
             ModelState.AddModelError(string.Empty, "Registration failed");
             return View(model);
+        }
+
+        [HttpGet]
+        public IActionResult Forbidden()
+        {
+            return View();
         }
     }
 }

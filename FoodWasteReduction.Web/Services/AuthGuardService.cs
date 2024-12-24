@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 public class AuthGuardService : IAuthGuardService
 {
@@ -11,31 +12,56 @@ public class AuthGuardService : IAuthGuardService
         _token = _httpContextAccessor.HttpContext?.Session.GetString("JWTToken");
     }
 
-    public bool IsAuthenticated => !string.IsNullOrEmpty(_token);
+    public bool IsAuthenticated => !string.IsNullOrEmpty(GetToken());
 
     public bool HasRole(string role)
     {
-        if (string.IsNullOrEmpty(_token))
+        try
+        {
+            var token = GetToken();
+            if (string.IsNullOrEmpty(token))
+                return false;
+
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(token);
+
+            var roles = jwtToken.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value);
+
+            return roles.Contains(role);
+        }
+        catch
+        {
             return false;
-
-        var handler = new JwtSecurityTokenHandler();
-        var jwtToken = handler.ReadJwtToken(_token);
-
-        var roles = jwtToken.Claims.Where(c => c.Type == "role").Select(c => c.Value);
-        return roles.Contains(role);
+        }
     }
 
     public void SetToken(string token)
     {
+        if (string.IsNullOrEmpty(token))
+            return;
+
         _token = token;
-        _httpContextAccessor.HttpContext?.Session.SetString("JWTToken", token);
+        if (_httpContextAccessor.HttpContext != null)
+        {
+            _httpContextAccessor.HttpContext.Session.SetString("JWTToken", token);
+        }
     }
 
     public void ClearToken()
     {
         _token = null;
-        _httpContextAccessor.HttpContext?.Session.Remove("JWTToken");
+        if (_httpContextAccessor.HttpContext != null)
+        {
+            _httpContextAccessor.HttpContext.Session.Remove("JWTToken");
+        }
     }
 
-    public string? GetToken() => _token;
+    public string? GetToken()
+    {
+        if (string.IsNullOrEmpty(_token))
+        {
+            _token = _httpContextAccessor.HttpContext?.Session.GetString("JWTToken");
+        }
+        return _token;
+    }
 }

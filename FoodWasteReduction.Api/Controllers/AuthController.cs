@@ -8,6 +8,7 @@ using FoodWasteReduction.Core.Entities;
 using FoodWasteReduction.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace FoodWasteReduction.Api.Controllers
@@ -167,6 +168,15 @@ namespace FoodWasteReduction.Api.Controllers
                 var roles = await _userManager.GetRolesAsync(user);
                 var token = GenerateJwtToken(user, roles);
 
+                DateTime? dateOfBirth = null;
+                if (roles.Contains("Student"))
+                {
+                    var student = await _applicationDbContext.Students?.FirstOrDefaultAsync(s =>
+                        s.Id == user.Id
+                    )!;
+                    dateOfBirth = student?.DateOfBirth;
+                }
+
                 return Ok(
                     new
                     {
@@ -174,7 +184,7 @@ namespace FoodWasteReduction.Api.Controllers
                         user.Email,
                         user.Name,
                         Roles = roles,
-                        (user as Student)?.DateOfBirth,
+                        DateOfBirth = dateOfBirth,
                     }
                 );
             }

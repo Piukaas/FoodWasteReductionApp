@@ -1,14 +1,52 @@
-<ul class="navbar-nav">
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-controller="Auth" asp-action="Login">Inloggen</a>
-    </li>
-    <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle text-dark" href="#" id="registerDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Registreren
-        </a>
-        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="registerDropdown">
-            <li><a class="dropdown-item" asp-controller="Auth" asp-action="RegisterStudent">Student</a></li>
-            <li><a class="dropdown-item" asp-controller="Auth" asp-action="RegisterCanteenStaff">Kantinemedewerker</a></li>
-        </ul>
-    </li>
-</ul>
+@using Newtonsoft.Json
+@{
+    var userData = Context.Session.GetString("UserData");
+    var isLoggedIn = !string.IsNullOrEmpty(userData);
+    dynamic? user = null;
+    if (isLoggedIn && userData != null)
+    {
+        user = JsonConvert.DeserializeObject(userData);
+    }
+}
+
+@if (isLoggedIn)
+{
+    <ul class="navbar-nav">
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle text-dark" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                @user?.Name (@((user?.Roles)?[0]?.ToString() == "CanteenStaff" ? "Kantinemedewerker" : "Student")
+                @{
+                    var dateOfBirth = user?.DateOfBirth?.ToString();
+                    if (!string.IsNullOrEmpty(dateOfBirth))
+                    {
+                        <span class="text-muted">- @DateTime.Parse(dateOfBirth).ToString("dd/MM/yyyy")</span>
+                    }
+                })
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                <li>
+                    <form asp-controller="Auth" asp-action="Logout" method="post">
+                        <button type="submit" class="dropdown-item">Uitloggen</button>
+                    </form>
+                </li>
+            </ul>
+        </li>
+    </ul>
+}
+else
+{
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-controller="Auth" asp-action="Login">Inloggen</a>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle text-dark" href="#" id="registerDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Registreren
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="registerDropdown">
+                <li><a class="dropdown-item" asp-controller="Auth" asp-action="RegisterStudent">Student</a></li>
+                <li><a class="dropdown-item" asp-controller="Auth" asp-action="RegisterCanteenStaff">Kantinemedewerker</a></li>
+            </ul>
+        </li>
+    </ul>
+}
