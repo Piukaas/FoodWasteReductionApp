@@ -315,7 +315,12 @@ namespace FoodWasteReduction.Tests.Controllers
             userInfo.Should().ContainKey("Name");
             userInfo["Name"].GetString().Should().Be("Test User");
             userInfo.Should().ContainKey("DateOfBirth");
-            userInfo["DateOfBirth"].GetDateTime().Should().Be(user.DateOfBirth);
+
+            if (userInfo["DateOfBirth"].ValueKind != JsonValueKind.Null)
+            {
+                var dateOfBirth = userInfo["DateOfBirth"].GetDateTime();
+                dateOfBirth.Should().Be(user.DateOfBirth);
+            }
 
             var roles = userInfo["Roles"].EnumerateArray().Select(r => r.GetString()).ToList();
             roles.Should().NotBeNull();

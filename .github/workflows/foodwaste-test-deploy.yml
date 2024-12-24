@@ -1,0 +1,104 @@
+name: Build, Test and Deploy Apps to Azure
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.x"
+
+      # Build Projects
+      - name: Build API
+        run: dotnet build FoodWasteReduction.Api/FoodWasteReduction.Api.csproj --configuration Release
+
+      - name: Build Web App
+        run: dotnet build FoodWasteReduction.Web/FoodWasteReduction.Web.csproj --configuration Release
+
+      # Run Tests
+      - name: Test API
+        run: dotnet test FoodWasteReduction.Tests/FoodWasteReduction.Tests.csproj --no-build --verbosity normal
+
+      # Database Migrations
+      - name: Install EF Core CLI
+        run: dotnet tool install --global dotnet-ef
+
+      - name: Apply database migrations
+        run: |
+          dotnet ef database update --project FoodWasteReduction.Infrastructure/FoodWasteReduction.Infrastructure.csproj --startup-project FoodWasteReduction.Api/FoodWasteReduction.Api.csproj --context ApplicationDbContext --connection "${{ secrets.AZURE_SQL_CONNECTION_STRING }}"
+          dotnet ef database update --project FoodWasteReduction.Infrastructure/FoodWasteReduction.Infrastructure.csproj --startup-project FoodWasteReduction.Api/FoodWasteReduction.Api.csproj --context ApplicationIdentityDbContext --connection "${{ secrets.AZURE_SQL_IDENTITY_CONNECTION_STRING }}"
+
+      # Publish Projects
+      - name: Publish API
+        run: dotnet publish FoodWasteReduction.Api/FoodWasteReduction.Api.csproj -c Release -o ${{env.DOTNET_ROOT}}/api
+
+      - name: Publish Web App
+        run: dotnet publish FoodWasteReduction.Web/FoodWasteReduction.Web.csproj -c Release -o ${{env.DOTNET_ROOT}}/web
+
+      # Upload Artifacts
+      - name: Upload API artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-app
+          path: ${{env.DOTNET_ROOT}}/api
+
+      - name: Upload Web artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-app
+          path: ${{env.DOTNET_ROOT}}/web
+
+  deploy-api:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    environment:
+      name: "Production"
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+
+    steps:
+      - name: Download API artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: api-app
+
+      - name: Deploy API to Azure
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: "foodwaste-api-app"
+          slot-name: "Production"
+          package: .
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_B7241B8CDB7B47E587455605567E1EB9 }}
+        env:
+          JWT_KEY: ${{ secrets.JWT_KEY }}
+
+  deploy-web:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    environment:
+      name: "Production"
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+
+    steps:
+      - name: Download Web artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: web-app
+
+      - name: Deploy Web to Azure
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: "foodwaste-web-app"
+          slot-name: "Production"
+          package: .
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_E5592119BF1D4A818F3D992D88DBEE74 }}
