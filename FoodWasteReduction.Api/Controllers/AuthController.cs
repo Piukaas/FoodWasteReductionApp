@@ -190,7 +190,7 @@ namespace FoodWasteReduction.Api.Controllers
                 );
             }
 
-            ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+            ModelState.AddModelError(string.Empty, "Verkeerde login gegevens");
             return BadRequest(ModelState);
         }
 

@@ -39,7 +39,7 @@ namespace FoodWasteReduction.Web.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            ModelState.AddModelError(string.Empty, "Invalid login attempt");
+            ModelState.AddModelError(string.Empty, "Verkeerde login gegevens");
             return View(model);
         }
 
