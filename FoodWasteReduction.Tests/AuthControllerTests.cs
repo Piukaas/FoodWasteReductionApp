@@ -206,7 +206,8 @@ namespace FoodWasteReduction.Tests.Controllers
             var badRequestResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
             var modelState = badRequestResult.Value as SerializableError;
             modelState.Should().ContainKey(string.Empty);
-            modelState[string.Empty]
+            modelState!
+                [string.Empty]
                 .As<string[]>()
                 .Should()
                 .Contain(x => x.Contains("16 years") && x.Contains("future"));
@@ -311,9 +312,9 @@ namespace FoodWasteReduction.Tests.Controllers
 
             userInfo.Should().NotBeNull();
             userInfo.Should().ContainKey("Email");
-            userInfo["Email"].GetString().Should().Be("test@example.com");
+            userInfo!["Email"].GetString().Should().Be("test@example.com");
             userInfo.Should().ContainKey("Name");
-            userInfo["Name"].GetString().Should().Be("Test User");
+            userInfo!["Name"].GetString().Should().Be("Test User");
             userInfo.Should().ContainKey("DateOfBirth");
 
             if (userInfo["DateOfBirth"].ValueKind != JsonValueKind.Null)
