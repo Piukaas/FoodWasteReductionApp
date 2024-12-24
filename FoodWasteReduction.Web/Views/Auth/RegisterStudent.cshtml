@@ -1,0 +1,68 @@
+@model RegisterStudentViewModel
+
+@{
+    ViewData["Title"] = "Register Student";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <h2 class="text-center mb-4">@ViewData["Title"]</h2>
+        <form asp-action="RegisterStudent" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="Email" class="control-label"></label>
+                <input asp-for="Email" class="form-control" autocomplete="email" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="StudentNumber" class="control-label"></label>
+                <input asp-for="StudentNumber" class="form-control" />
+                <span asp-validation-for="StudentNumber" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="DateOfBirth" class="control-label"></label>
+                <input asp-for="DateOfBirth" class="form-control" type="date" />
+                <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="StudyCity" class="control-label"></label>
+                <input asp-for="StudyCity" class="form-control" />
+                <span asp-validation-for="StudyCity" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Password" class="control-label"></label>
+                <input asp-for="Password" class="form-control" autocomplete="new-password" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="ConfirmPassword" class="control-label"></label>
+                <input asp-for="ConfirmPassword" class="form-control" autocomplete="new-password" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+
+            <div class="form-group d-grid mb-3">
+                <button type="submit" class="btn btn-primary">Register</button>
+            </div>
+
+            <div class="text-center">
+                <p>Already have an account? <a asp-action="Login">Login here</a></p>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

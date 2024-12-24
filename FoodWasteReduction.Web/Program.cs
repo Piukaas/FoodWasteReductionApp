@@ -1,7 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-using FoodWasteReduction.Infrastructure.Data;
-using FoodWasteReduction.Infrastructure.Identity;
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -12,11 +8,36 @@ if (builder.Environment.IsDevelopment())
     builder.Configuration.AddUserSecrets<Program>();
 }
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+// Configure API client
+var baseUrl = builder.Environment.IsDevelopment()
+    ? builder.Configuration["ApiSettings:BaseUrl:Development"]
+    : builder.Configuration["ApiSettings:BaseUrl:Production"];
 
-builder.Services.AddDbContext<ApplicationIdentityDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("IdentityConnection")));
+if (string.IsNullOrEmpty(baseUrl))
+{
+    throw new InvalidOperationException("API base URL is not configured");
+}
+
+builder
+    .Services.AddHttpClient(
+        "API",
+        client =>
+        {
+            client.BaseAddress = new Uri(baseUrl);
+            client.DefaultRequestHeaders.Accept.Add(
+                new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json")
+            );
+        }
+    )
+    .ConfigurePrimaryHttpMessageHandler(
+        () =>
+            new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback =
+                    HttpClientHandler.DangerousAcceptAnyServerCertificateValidator,
+            }
+    );
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 var app = builder.Build();
 
@@ -25,15 +46,16 @@ if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
 }
+else
+{
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
+}
 
-// app.UseHttpsRedirection();
 app.UseStaticFiles();
-app.UsePathBase("/");
 app.UseRouting();
 app.UseAuthorization();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

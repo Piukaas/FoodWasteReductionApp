@@ -4,41 +4,29 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:6707",
+      "applicationUrl": "http://localhost:5193",
       "sslPort": 44375
     }
   },
   "profiles": {
-    "http": {
+    "Development": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "applicationUrl": "http://localhost:5193",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_DETAILED_ERRORS": "1"
       }
     },
-    "https": {
+    "Production": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
-      "applicationUrl": "https://localhost:7087;http://localhost:5193",
+      "applicationUrl": "https://localhost:7087",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Production"
       }
-    },
-    "IIS Express": {
-      "commandName": "IISExpress",
-      "launchBrowser": true,
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
-    }
-  },
-  "ApiSettings": {
-    "BaseUrl": {
-      "Development": "https://localhost:5019/api",
-      "Production": "https://foodwaste-api-app-h4crb9bkbzemaqcs.westeurope-01.azurewebsites.net"
     }
   }
 }

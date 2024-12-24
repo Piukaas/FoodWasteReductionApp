@@ -1,0 +1,14 @@
+<ul class="navbar-nav">
+    <li class="nav-item">
+        <a class="nav-link text-dark" asp-controller="Auth" asp-action="Login">Inloggen</a>
+    </li>
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle text-dark" href="#" id="registerDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Registreren
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="registerDropdown">
+            <li><a class="dropdown-item" asp-controller="Auth" asp-action="RegisterStudent">Student</a></li>
+            <li><a class="dropdown-item" asp-controller="Auth" asp-action="RegisterCanteenStaff">Kantinemedewerker</a></li>
+        </ul>
+    </li>
+</ul>
