@@ -14,11 +14,6 @@ if (builder.Environment.IsDevelopment())
 {
     builder.Configuration.AddUserSecrets<Program>();
 }
-else
-{
-    DotNetEnv.Env.Load();
-    builder.Configuration["Jwt:Key"] = Environment.GetEnvironmentVariable("JWT_KEY");
-}
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))

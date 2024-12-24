@@ -75,7 +75,7 @@ namespace FoodWasteReduction.Tests.Controllers
             _mockConfiguration = new Mock<IConfiguration>();
             _mockConfiguration
                 .SetupGet(x => x["Jwt:Key"])
-                .Returns("YourSuperSecretKey1234567890123456");
+                .Returns("MegaSuperSecretKey1234567890123456");
             _mockConfiguration.SetupGet(x => x["Jwt:Issuer"]).Returns("FoodWasteReductionApp");
             _mockConfiguration.SetupGet(x => x["Jwt:Audience"]).Returns("http://localhost:5019");
             _mockConfiguration.SetupGet(x => x["Jwt:ExpireMinutes"]).Returns("30");
