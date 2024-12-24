@@ -1,13 +1,18 @@
+using System.ComponentModel.DataAnnotations;
+using FoodWasteReduction.Core.Validation;
+
 namespace FoodWasteReduction.Core.Entities
 {
-    public class Student
+    public class Student : ApplicationUser
     {
-        public int Id { get; set; }
-        public string Name { get; set; } = string.Empty;
+        [Required]
+        [MinimumAge(16)]
         public DateTime DateOfBirth { get; set; }
+
+        [Required]
         public string StudentNumber { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
+
+        [Required]
         public string StudyCity { get; set; } = string.Empty;
-        public string PhoneNumber { get; set; } = string.Empty;
     }
 }

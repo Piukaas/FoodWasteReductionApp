@@ -18,7 +18,7 @@ namespace FoodWasteReduction.Api.Controllers
         [HttpGet]
         public IEnumerable<Student> Get()
         {
-            return _context.Students.ToList();
+            return _context.Students?.ToList() ?? [];
         }
     }
 }

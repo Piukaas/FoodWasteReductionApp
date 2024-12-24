@@ -11,7 +11,7 @@ namespace FoodWasteReduction.Tests
             // Arrange
             var student = new Student
             {
-                Id = 1,
+                Id = "1",
                 Name = "John Doe",
                 DateOfBirth = new DateTime(2000, 1, 1),
                 StudentNumber = "S123456",
@@ -21,7 +21,7 @@ namespace FoodWasteReduction.Tests
             };
 
             // Act & Assert
-            Assert.Equal(1, student.Id);
+            Assert.Equal("1", student.Id);
             Assert.Equal("John Doe", student.Name);
             Assert.Equal(new DateTime(2000, 1, 1), student.DateOfBirth);
             Assert.Equal("S123456", student.StudentNumber);

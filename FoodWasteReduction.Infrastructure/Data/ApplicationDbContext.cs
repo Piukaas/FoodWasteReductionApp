@@ -10,8 +10,22 @@ namespace FoodWasteReduction.Infrastructure.Data
         {
         }
 
-        // Add your DbSet properties here later
-        public DbSet<Student> Students { get; set; }
-        // public DbSet<Package> Packages { get; set; }
+        public DbSet<Student>? Students { get; set; }
+        public DbSet<CanteenStaff>? CanteenStaff { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            builder.Entity<Student>(entity =>
+            {
+                entity.ToTable("Students");
+            });
+
+            builder.Entity<CanteenStaff>(entity =>
+            {
+                entity.ToTable("CanteenStaff");
+            });
+        }
     }
 }

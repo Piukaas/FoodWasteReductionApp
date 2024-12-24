@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using FoodWasteReduction.Infrastructure.Data;
 using FoodWasteReduction.Infrastructure.Identity;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Identity;
+using FoodWasteReduction.Core.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +21,20 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddDbContext<ApplicationIdentityDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("IdentityConnection")));
 
+// Add Identity
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => 
+{
+    options.SignIn.RequireConfirmedAccount = false;
+    options.Password.RequireDigit = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequiredLength = 8;
+    options.Password.RequiredUniqueChars = 1;
+})
+.AddEntityFrameworkStores<ApplicationIdentityDbContext>()
+.AddDefaultTokenProviders();
+
 // Add Swagger services
 builder.Services.AddSwaggerGen(c =>
 {
@@ -27,6 +43,13 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
+
+// Seed roles at startup
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    await RoleSeeder.SeedRoles(roleManager);
+}
 
 if (app.Environment.IsDevelopment())
 {
@@ -37,10 +60,11 @@ app.UseSwagger();
 app.UseSwaggerUI(c => 
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "FoodWasteReduction API v1");
-    c.RoutePrefix = string.Empty;  // Serve the Swagger UI at the root
+    c.RoutePrefix = string.Empty;
 });
 
 app.UseRouting();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
