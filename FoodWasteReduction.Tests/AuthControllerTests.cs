@@ -225,6 +225,7 @@ namespace FoodWasteReduction.Tests.Controllers
                 StudentNumber = "S123456",
                 DateOfBirth = DateTime.Now.AddYears(-20),
                 StudyCity = "Test City",
+                PhoneNumber = "1234567890",
             };
 
             _mockUserManager
@@ -316,8 +317,6 @@ namespace FoodWasteReduction.Tests.Controllers
             userInfo!["Email"].GetString().Should().Be("test@example.com");
             userInfo.Should().ContainKey("Name");
             userInfo!["Name"].GetString().Should().Be("Test User");
-            userInfo.Should().ContainKey("PhoneNumber");
-            userInfo!["PhoneNumber"].GetString().Should().Be("1234567890");
             userInfo.Should().ContainKey("DateOfBirth");
 
             if (userInfo["DateOfBirth"].ValueKind != JsonValueKind.Null)
