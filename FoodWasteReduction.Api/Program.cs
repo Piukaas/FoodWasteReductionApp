@@ -1,9 +1,9 @@
-using Microsoft.EntityFrameworkCore;
+using FoodWasteReduction.Core.Entities;
 using FoodWasteReduction.Infrastructure.Data;
 using FoodWasteReduction.Infrastructure.Identity;
-using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Identity;
-using FoodWasteReduction.Core.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,24 +16,27 @@ if (builder.Environment.IsDevelopment())
 }
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+);
 
 builder.Services.AddDbContext<ApplicationIdentityDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("IdentityConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("IdentityConnection"))
+);
 
 // Add Identity
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => 
-{
-    options.SignIn.RequireConfirmedAccount = false;
-    options.Password.RequireDigit = false;
-    options.Password.RequireLowercase = false;
-    options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequireUppercase = false;
-    options.Password.RequiredLength = 8;
-    options.Password.RequiredUniqueChars = 1;
-})
-.AddEntityFrameworkStores<ApplicationIdentityDbContext>()
-.AddDefaultTokenProviders();
+builder
+    .Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+    {
+        options.SignIn.RequireConfirmedAccount = false;
+        options.Password.RequireDigit = false;
+        options.Password.RequireLowercase = false;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequireUppercase = false;
+        options.Password.RequiredLength = 8;
+        options.Password.RequiredUniqueChars = 1;
+    })
+    .AddEntityFrameworkStores<ApplicationIdentityDbContext>()
+    .AddDefaultTokenProviders();
 
 // Add Swagger services
 builder.Services.AddSwaggerGen(c =>
@@ -57,7 +60,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseSwagger();
-app.UseSwaggerUI(c => 
+app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "FoodWasteReduction API v1");
     c.RoutePrefix = string.Empty;

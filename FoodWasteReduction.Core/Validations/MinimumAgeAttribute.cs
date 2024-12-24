@@ -11,13 +11,16 @@ namespace FoodWasteReduction.Core.Validation
             _minimumAge = minimumAge;
         }
 
-        protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
+        protected override ValidationResult? IsValid(
+            object? value,
+            ValidationContext validationContext
+        )
         {
             if (value is DateTime dateOfBirth)
             {
                 var today = DateTime.Today;
                 var age = today.Year - dateOfBirth.Year;
-                
+
                 if (dateOfBirth.Date > today.AddYears(-age))
                 {
                     age--;
@@ -25,7 +28,9 @@ namespace FoodWasteReduction.Core.Validation
 
                 if (dateOfBirth > today || age < _minimumAge)
                 {
-                    return new ValidationResult($"Persoon moet ten minste {_minimumAge} jaar oud zijn en datum mag niet in de toekomst zijn.");
+                    return new ValidationResult(
+                        $"Person has to be atleast {_minimumAge} years old and the date should not be in the future."
+                    );
                 }
             }
             return ValidationResult.Success;

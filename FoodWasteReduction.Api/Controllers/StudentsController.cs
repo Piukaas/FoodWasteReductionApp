@@ -1,6 +1,6 @@
-using Microsoft.AspNetCore.Mvc;
-using FoodWasteReduction.Infrastructure.Data;
 using FoodWasteReduction.Core.Entities;
+using FoodWasteReduction.Infrastructure.Data;
+using Microsoft.AspNetCore.Mvc;
 
 namespace FoodWasteReduction.Api.Controllers
 {
