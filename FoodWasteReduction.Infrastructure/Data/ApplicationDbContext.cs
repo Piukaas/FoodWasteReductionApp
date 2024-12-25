@@ -10,6 +10,9 @@ namespace FoodWasteReduction.Infrastructure.Data
 
         public DbSet<Student>? Students { get; set; }
         public DbSet<CanteenStaff>? CanteenStaff { get; set; }
+        public DbSet<Canteen>? Canteens { get; set; }
+        public DbSet<Product>? Products { get; set; }
+        public DbSet<Package>? Packages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -23,6 +26,23 @@ namespace FoodWasteReduction.Infrastructure.Data
             builder.Entity<CanteenStaff>(entity =>
             {
                 entity.ToTable("CanteenStaff");
+            });
+
+            builder.Entity<Package>(entity =>
+            {
+                entity
+                    .HasOne(p => p.Canteen)
+                    .WithMany()
+                    .HasForeignKey(p => p.CanteenId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasMany(p => p.Products).WithMany();
+
+                entity
+                    .HasOne(p => p.ReservedBy)
+                    .WithMany()
+                    .HasForeignKey(p => p.ReservedById)
+                    .OnDelete(DeleteBehavior.SetNull);
             });
         }
     }

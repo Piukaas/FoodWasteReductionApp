@@ -1,14 +1,16 @@
 using System.ComponentModel.DataAnnotations;
 using FoodWasteReduction.Core.Enums;
 
-namespace FoodWasteReduction.Core.Entities
+namespace FoodWasteReduction.Core.DTOs
 {
-    public class CanteenStaff : ApplicationUser
+    public class CreateCanteenDTO
     {
         [Required]
-        public string PersonnelNumber { get; set; } = string.Empty;
+        public City City { get; set; }
 
         [Required]
         public Location Location { get; set; }
+
+        public bool ServesWarmMeals { get; set; } = false;
     }
 }

@@ -3,6 +3,7 @@ using FluentAssertions;
 using FoodWasteReduction.Api.Controllers;
 using FoodWasteReduction.Core.DTOs.Auth;
 using FoodWasteReduction.Core.Entities;
+using FoodWasteReduction.Core.Enums;
 using FoodWasteReduction.Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
@@ -252,7 +253,7 @@ namespace FoodWasteReduction.Tests.Controllers
                 Password = "ValidPass123!",
                 Name = "Staff User",
                 PersonnelNumber = "P123456",
-                Location = "Main Building",
+                Location = Location.LA,
             };
 
             _mockUserManager

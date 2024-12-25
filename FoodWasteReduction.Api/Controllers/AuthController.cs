@@ -5,6 +5,7 @@ using System.Text;
 using FoodWasteReduction.Core.Constants;
 using FoodWasteReduction.Core.DTOs.Auth;
 using FoodWasteReduction.Core.Entities;
+using FoodWasteReduction.Core.Enums;
 using FoodWasteReduction.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
