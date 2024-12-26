@@ -1,0 +1,62 @@
+@using FoodWasteReduction.Core.Entities
+@model IEnumerable<FoodWasteReduction.Core.Entities.Package>
+@{
+    ViewData["Title"] = "Mijn Reserveringen";
+}
+
+<div class="container mt-4">
+    <h1>@ViewData["Title"]</h1>
+
+    <div class="row">
+        @if (!Model.Any())
+        {
+            <div class="col-12">
+                <p>Je hebt nog geen reserveringen.</p>
+            </div>
+        }
+        else
+        {
+            @foreach (var package in Model)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            @if (DateTime.Now > package.ExpiryTime)
+                            {
+                                <span class="position-absolute top-0 end-0 badge bg-warning mt-3 me-5">Verlopen</span>
+                            }
+                            @if (package.Is18Plus)
+                            {
+                                <span class="position-absolute top-0 end-0 badge bg-danger mt-3 me-1">18+</span>
+                            }
+
+                            <h5 class="card-title">@package.Name</h5>
+                            <p class="card-text">
+                                <strong>€@package.Price.ToString("F2")</strong><br />
+                                <small>Pickup: @package.PickupTime.ToString("g")</small><br />
+                                <small>Verloopt: @package.ExpiryTime.ToString("g")</small><br />
+                                <small>Locatie: @package.Canteen?.Location - @package.Canteen?.City</small>
+                            </p>
+
+                            <div class="mt-3">
+                                <h6>Producten:</h6>
+                                <ul class="list-unstyled">
+                                    @foreach (var product in package.Products ?? Enumerable.Empty<Product>())
+                                    {
+                                        <li>
+                                            @product.Name
+                                            @if (product.ContainsAlcohol)
+                                            {
+                                                <small class="text-danger ms-1">(Alcohol)</small>
+                                            }
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>

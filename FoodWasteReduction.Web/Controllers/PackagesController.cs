@@ -1,5 +1,7 @@
 using System.Text.Json.Nodes;
+using FoodWasteReduction.Core.Constants;
 using FoodWasteReduction.Core.Enums;
+using FoodWasteReduction.Web.Attributes;
 using FoodWasteReduction.Web.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,6 +11,7 @@ namespace FoodWasteReduction.Web.Controllers
     {
         private readonly IPackageService _packageService = packageService;
 
+        [AuthorizeRole(Roles.Student)]
         public async Task<IActionResult> Index(City? city = null, MealType? type = null)
         {
             DateTime? dateOfBirth = null;
@@ -37,6 +40,22 @@ namespace FoodWasteReduction.Web.Controllers
             ViewData["SelectedType"] = type;
 
             var packages = await _packageService.GetAvailablePackages(city, type);
+            return View(packages);
+        }
+
+        [AuthorizeRole(Roles.Student)]
+        public async Task<IActionResult> Reservations()
+        {
+            var userData = HttpContext.Session.GetString("UserData");
+            string? userId = null;
+
+            if (!string.IsNullOrEmpty(userData))
+            {
+                var jsonObject = JsonNode.Parse(userData);
+                userId = jsonObject?["Id"]?.GetValue<string>();
+            }
+
+            var packages = await _packageService.GetReservedPackages(userId);
             return View(packages);
         }
     }
