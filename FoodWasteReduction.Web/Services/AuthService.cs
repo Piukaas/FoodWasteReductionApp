@@ -46,6 +46,9 @@ namespace FoodWasteReduction.Web.Services
                 Location = additionalData.TryGetProperty("Location", out var location)
                     ? (Location?)location.GetInt32()
                     : null,
+                DateOfBirth = additionalData.TryGetProperty("DateOfBirth", out var dob)
+                    ? (DateTime?)dob.GetDateTime()
+                    : null,
             };
 
             return (true, token, userData);
