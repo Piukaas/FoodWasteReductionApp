@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using FoodWasteReduction.Core.Enums;
 
 namespace FoodWasteReduction.Web.Models.Auth
 {
@@ -19,7 +20,7 @@ namespace FoodWasteReduction.Web.Models.Auth
 
         [Required(ErrorMessage = "Locatie is verplicht")]
         [Display(Name = "Locatie")]
-        public string Location { get; set; } = string.Empty;
+        public Location Location { get; set; }
 
         [Required(ErrorMessage = "Wachtwoord is verplicht")]
         [MinLength(8, ErrorMessage = "Wachtwoord moet tenminste 8 karakters bevatten")]

@@ -40,8 +40,8 @@ body {
   color: black;
 }
 
-.form-control,
-.form-select :focus {
+.form-control:focus,
+.form-select:focus {
   border-color: #2a6f82;
   box-shadow: 0 0 0 0.25rem rgba(42, 111, 130, 0.5);
   outline: 0;

@@ -1,3 +1,4 @@
+@using FoodWasteReduction.Core.Enums
 @model RegisterStudentViewModel
 
 @{
@@ -37,7 +38,12 @@
 
             <div class="form-group mb-3">
                 <label asp-for="StudyCity" class="control-label"></label>
-                <input asp-for="StudyCity" class="form-control" />
+                <select asp-for="StudyCity" class="form-select">
+                    @foreach (var city in Enum.GetValues<City>())
+                    {
+                        <option value="@city">@city</option>
+                    }
+                </select>
                 <span asp-validation-for="StudyCity" class="text-danger"></span>
             </div>
 

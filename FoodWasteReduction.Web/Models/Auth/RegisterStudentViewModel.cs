@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using FoodWasteReduction.Core.Enums;
 using FoodWasteReduction.Core.Validation;
 
 namespace FoodWasteReduction.Web.Models.Auth
@@ -26,7 +27,7 @@ namespace FoodWasteReduction.Web.Models.Auth
 
         [Required(ErrorMessage = "Studiestad is verplicht")]
         [Display(Name = "Studiestad")]
-        public string StudyCity { get; set; } = string.Empty;
+        public City StudyCity { get; set; }
 
         [Required(ErrorMessage = "Telefoonnummer is verplicht")]
         [Phone(ErrorMessage = "Ongeldig telefoonnummer")]
