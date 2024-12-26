@@ -111,6 +111,57 @@ namespace FoodWasteReduction.Web.Services
             return packages;
         }
 
+        public async Task<IEnumerable<Package>> GetPackagesForManagement(int? canteenId = null)
+        {
+            var query =
+                $@"
+                query GetPackagesForManagement {{
+                    packages{(canteenId.HasValue ? $"(where: {{ canteenId: {{ eq: {canteenId} }} }})" : "")} {{
+                        id
+                        name
+                        price
+                        pickupTime
+                        expiryTime
+                        is18Plus
+                        type
+                        city
+                        products {{
+                            id
+                            name
+                            containsAlcohol
+                            imageUrl
+                        }}
+                        canteen {{
+                            id
+                            city
+                            location
+                        }}
+                        reservedBy {{
+                            id
+                            email
+                            name
+                            phoneNumber
+                        }}
+                    }}
+                }}";
+
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                Converters = { new JsonStringEnumConverter() },
+            };
+
+            var response = await _httpClient.PostAsJsonAsync("graphql", new { query });
+            var content = await response.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<GraphQLResponse<PackagesData>>(
+                content,
+                options
+            );
+            var packages = result?.Data?.Packages ?? [];
+
+            return packages.OrderBy(p => p.PickupTime);
+        }
+
         public async Task<IEnumerable<Product>> GetProducts()
         {
             var query =

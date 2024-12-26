@@ -7,6 +7,7 @@ namespace FoodWasteReduction.Web.Services.Interfaces
     {
         Task<IEnumerable<Package>> GetAvailablePackages(City? city = null, MealType? type = null);
         Task<IEnumerable<Package>> GetReservedPackages(string? userId = null);
+        Task<IEnumerable<Package>> GetPackagesForManagement(int? canteenId = null);
         Task<IEnumerable<Product>> GetProducts();
     }
 }

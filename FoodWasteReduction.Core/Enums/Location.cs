@@ -6,5 +6,9 @@ namespace FoodWasteReduction.Core.Enums
         LD,
         HS,
         HB,
+        DB0,
+        DB1,
+        TA,
+        TS,
     }
 }
