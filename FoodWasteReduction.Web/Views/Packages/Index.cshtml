@@ -6,12 +6,6 @@
     Layout = "_Layout";
 }
 
-@{
-    var userDateOfBirth = ViewData["UserDateOfBirth"] as DateTime?;
-    var userAge = userDateOfBirth.HasValue ?
-        (int)((DateTime.Now - userDateOfBirth.Value).TotalDays / 365.25) : 0;
-}
-
 <div class="container mt-4">
     <h1>@ViewData["Title"]</h1>
 
@@ -60,6 +54,10 @@
         {
             @foreach (var package in Model)
             {
+                var userDateOfBirth = ViewData["UserDateOfBirth"] as DateTime?;
+                var userAge = userDateOfBirth.HasValue ?
+                    (int)((package.PickupTime - userDateOfBirth.Value).TotalDays / 365.25) : 0;
+
                 <div class="col-md-4 mb-4">
                     <div class="card shadow-sm">
                         <div class="card-body">
