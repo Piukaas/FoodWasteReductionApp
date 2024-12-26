@@ -23,7 +23,11 @@
                         <div class="card-body">
                             @if (DateTime.Now > package.ExpiryTime)
                             {
-                                <span class="position-absolute top-0 end-0 badge bg-danger mt-3 me-3">Verlopen</span>
+                                <span class="position-absolute top-0 end-0 badge bg-warning mt-3 me-5">Verlopen</span>
+                            }
+                            @if (package.Is18Plus)
+                            {
+                                <span class="position-absolute top-0 end-0 badge bg-danger mt-3 me-1">18+</span>
                             }
 
                             <h5 class="card-title">@package.Name</h5>
@@ -43,7 +47,7 @@
                                             @product.Name
                                             @if (product.ContainsAlcohol)
                                             {
-                                                <small class="text-danger ms-1">(18+)</small>
+                                                <small class="text-danger ms-1">(Alcohol)</small>
                                             }
                                         </li>
                                     }
