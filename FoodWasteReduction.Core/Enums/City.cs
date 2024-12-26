@@ -3,7 +3,7 @@ namespace FoodWasteReduction.Core.Enums
     public enum City
     {
         Breda,
-        DenBosch,
+        Den_Bosch,
         Tilburg,
     }
 }

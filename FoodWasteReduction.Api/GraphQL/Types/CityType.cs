@@ -7,7 +7,7 @@ namespace FoodWasteReduction.Api.GraphQL.Types
         protected override void Configure(IEnumTypeDescriptor<City> descriptor)
         {
             descriptor.Value(City.Breda).Name("Breda");
-            descriptor.Value(City.DenBosch).Name("DenBosch");
+            descriptor.Value(City.Den_Bosch).Name("Den_Bosch");
             descriptor.Value(City.Tilburg).Name("Tilburg");
         }
     }

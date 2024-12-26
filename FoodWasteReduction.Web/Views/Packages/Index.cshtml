@@ -1,8 +1,5 @@
-@using FoodWasteReduction.Core.Constants
 @using FoodWasteReduction.Core.Entities
 @using FoodWasteReduction.Core.Enums
-@using FoodWasteReduction.Web.Services.Interfaces
-@inject IAuthGuardService AuthGuard
 @model IEnumerable<FoodWasteReduction.Core.Entities.Package>
 @{
     ViewData["Title"] = "Pakketten";
@@ -103,10 +100,7 @@
                             </div>
 
                             <div class="d-flex justify-content-end mt-3">
-                                @if (AuthGuard.HasRole(Roles.Student))
-                                {
-                                    <button class="btn btn-primary">Reserveer</button>
-                                }
+                                <button class="btn btn-primary">Reserveer</button>
                             </div>
                         </div>
                     </div>

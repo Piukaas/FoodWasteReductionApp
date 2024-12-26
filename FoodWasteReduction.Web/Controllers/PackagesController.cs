@@ -1,4 +1,3 @@
-using System.Text.Json;
 using System.Text.Json.Nodes;
 using FoodWasteReduction.Core.Constants;
 using FoodWasteReduction.Core.Enums;
@@ -8,18 +7,14 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FoodWasteReduction.Web.Controllers
 {
-    public class PackagesController(
-        IPackageService packageService,
-        IAuthGuardService authGuardService
-    ) : Controller
+    public class PackagesController(IPackageService packageService) : Controller
     {
         private readonly IPackageService _packageService = packageService;
-        private readonly IAuthGuardService _authGuardService = authGuardService;
 
-        [AuthorizeRole(Roles.Student, Roles.CanteenStaff)]
+        [AuthorizeRole(Roles.Student)]
         public async Task<IActionResult> Index(City? city = null, MealType? type = null)
         {
-            if (_authGuardService.HasRole(Roles.Student) && !Request.Query.ContainsKey("city"))
+            if (!Request.Query.ContainsKey("city"))
             {
                 var userData = HttpContext.Session.GetString("UserData");
                 if (!string.IsNullOrEmpty(userData))

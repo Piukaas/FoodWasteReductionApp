@@ -1,4 +1,5 @@
-﻿@using FoodWasteReduction.Web.Services.Interfaces
+﻿@using FoodWasteReduction.Core.Constants
+@using FoodWasteReduction.Web.Services.Interfaces
 @inject IAuthGuardService AuthGuard
 
 <!DOCTYPE html>
@@ -31,7 +32,7 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        @if (AuthGuard.IsAuthenticated)
+                        @if (AuthGuard.HasRole(Roles.Student))
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Packages"

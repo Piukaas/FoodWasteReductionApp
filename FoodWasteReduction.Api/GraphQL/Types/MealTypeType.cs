@@ -6,9 +6,9 @@ namespace FoodWasteReduction.Api.GraphQL.Types
     {
         protected override void Configure(IEnumTypeDescriptor<MealType> descriptor)
         {
-            descriptor.Value(MealType.Bread).Name("Bread");
-            descriptor.Value(MealType.WarmMeal).Name("WarmMeal");
-            descriptor.Value(MealType.Drinks).Name("Drinks");
+            descriptor.Value(MealType.Brood).Name("Brood");
+            descriptor.Value(MealType.Warm).Name("Warm");
+            descriptor.Value(MealType.Drankjes).Name("Drankjes");
             descriptor.Value(MealType.Snacks).Name("Snacks");
         }
     }
