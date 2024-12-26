@@ -21,7 +21,7 @@ namespace FoodWasteReduction.Core.Entities
         public int CanteenId { get; set; }
 
         [ForeignKey("CanteenId")]
-        public virtual Canteen Canteen { get; set; } = null!;
+        public virtual Canteen? Canteen { get; set; }
 
         [Required]
         public MealType Type { get; set; }
@@ -41,6 +41,6 @@ namespace FoodWasteReduction.Core.Entities
         [ForeignKey("ReservedById")]
         public virtual Student? ReservedBy { get; set; }
 
-        public virtual ICollection<Product> Products { get; set; } = new List<Product>();
+        public virtual ICollection<Product> Products { get; set; } = [];
     }
 }

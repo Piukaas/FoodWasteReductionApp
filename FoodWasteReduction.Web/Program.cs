@@ -44,6 +44,8 @@ builder
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IAuthGuardService, AuthGuardService>();
+builder.Services.AddScoped<IPackageService, PackageService>();
+
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);

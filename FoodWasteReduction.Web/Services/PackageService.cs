@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using FoodWasteReduction.Core.Entities;
 using FoodWasteReduction.Core.Enums;
 using FoodWasteReduction.Web.Services.Interfaces;
@@ -16,36 +17,55 @@ namespace FoodWasteReduction.Web.Services
         {
             var query =
                 @"
-            query GetAvailablePackages($city: City, $mealType: MealType) {
-                packages(where: {
-                    and: [
-                        { reservedById: { isNull: true } },
-                        { city: { eq: $city } },
-                        { type: { eq: $mealType } }
-                    ]
-                }) {
-                    id
-                    name
-                    price
-                    pickupTime
-                    expiryTime
-                    products {
-                        name
-                        containsAlcohol
-                    }
-                    canteen {
-                        city
-                        location
-                    }
-                }
-            }";
+                    query GetPackages {
+                        packages(
+                            where: {
+                                reservedById: { eq: null }
+                                "
+                + (city.HasValue ? $", city: {{ eq: {(int)city.Value} }}" : "")
+                + @"
+                                "
+                + (type.HasValue ? $", type: {{ eq: {(int)type.Value} }}" : "")
+                + @"
+                            }
+                        ) {
+                            id
+                            name
+                            city
+                            type
+                            pickupTime
+                            expiryTime
+                            price
+                            is18Plus
+                            products {
+                                name
+                                containsAlcohol
+                                imageUrl
+                            }
+                            canteen {
+                                city
+                                location
+                            }
+                        }
+                    }";
 
-            var variables = new { city = city?.ToString(), mealType = type?.ToString() };
-            var response = await _httpClient.PostAsJsonAsync("graphql", new { query, variables });
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                Converters = { new JsonStringEnumConverter() },
+            };
+
+            var response = await _httpClient.PostAsJsonAsync("graphql", new { query });
             var content = await response.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<GraphQLResponse<PackagesData>>(content);
+            var result = JsonSerializer.Deserialize<GraphQLResponse<PackagesData>>(
+                content,
+                options
+            );
 
-            return result?.Data?.Packages ?? [];
+            if (result?.Data?.Packages == null)
+                return [];
+
+            return result.Data.Packages;
         }
 
         public async Task<IEnumerable<Package>> GetReservedPackages(string? userId = null)
@@ -64,6 +84,7 @@ namespace FoodWasteReduction.Web.Services
                     products {
                         name
                         containsAlcohol
+                        imageUrl
                     }
                     canteen {
                         city
@@ -102,11 +123,6 @@ namespace FoodWasteReduction.Web.Services
             var result = JsonSerializer.Deserialize<GraphQLResponse<ProductsData>>(content);
 
             return result?.Data?.Products ?? [];
-        }
-
-        public Task<IEnumerable<Package>> GetPackages(City? city = null, MealType? type = null)
-        {
-            throw new NotImplementedException();
         }
     }
 

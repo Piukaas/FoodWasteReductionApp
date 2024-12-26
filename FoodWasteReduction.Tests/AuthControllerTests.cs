@@ -100,7 +100,7 @@ namespace FoodWasteReduction.Tests.Controllers
                 Name = "Test User",
                 StudentNumber = "S123456",
                 DateOfBirth = new DateTime(2000, 1, 1),
-                StudyCity = "Test City",
+                StudyCity = City.Breda,
             };
 
             _mockUserManager
@@ -131,7 +131,7 @@ namespace FoodWasteReduction.Tests.Controllers
                 Name = "Test User",
                 StudentNumber = "S123456",
                 DateOfBirth = new DateTime(2000, 1, 1),
-                StudyCity = "Test City",
+                StudyCity = City.Breda,
             };
 
             _mockUserManager
@@ -162,7 +162,7 @@ namespace FoodWasteReduction.Tests.Controllers
                 Name = "Test User",
                 StudentNumber = "S123456",
                 DateOfBirth = DateTime.Now.AddYears(-15), // 15 years old
-                StudyCity = "Test City",
+                StudyCity = City.Breda,
             };
 
             _mockUserManager
@@ -193,7 +193,7 @@ namespace FoodWasteReduction.Tests.Controllers
                 Name = "Test User",
                 StudentNumber = "S123456",
                 DateOfBirth = DateTime.Now.AddDays(1), // Future date
-                StudyCity = "Test City",
+                StudyCity = City.Breda,
             };
 
             _mockUserManager
@@ -225,7 +225,7 @@ namespace FoodWasteReduction.Tests.Controllers
                 Name = "Valid User",
                 StudentNumber = "S123456",
                 DateOfBirth = DateTime.Now.AddYears(-20),
-                StudyCity = "Test City",
+                StudyCity = City.Breda,
                 PhoneNumber = "1234567890",
             };
 
@@ -283,7 +283,7 @@ namespace FoodWasteReduction.Tests.Controllers
                 Name = "Test User",
                 StudentNumber = "S123456",
                 DateOfBirth = DateTime.Now.AddYears(-20),
-                StudyCity = "Test City",
+                StudyCity = City.Breda,
                 PhoneNumber = "1234567890",
             };
 

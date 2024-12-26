@@ -1,4 +1,5 @@
 using System.Text.Json;
+using FoodWasteReduction.Core.Enums;
 using FoodWasteReduction.Web.Models.Auth;
 using FoodWasteReduction.Web.Services.Interfaces;
 
@@ -16,30 +17,37 @@ namespace FoodWasteReduction.Web.Services
             if (!response.IsSuccessStatusCode)
                 return (false, string.Empty, null);
 
-            var responseData = await response.Content.ReadFromJsonAsync<
-                Dictionary<string, object>
+            var content = await response.Content.ReadFromJsonAsync<
+                Dictionary<string, JsonElement>
             >();
-            if (responseData == null || !responseData.ContainsKey("token"))
+            if (content == null)
                 return (false, string.Empty, null);
 
-            var token = responseData["token"]?.ToString() ?? string.Empty;
-            var roles =
-                responseData["roles"] is JsonElement rolesElement
-                && rolesElement.ValueKind == JsonValueKind.Array
-                    ? rolesElement
-                        .EnumerateArray()
-                        .Select(static r => r.GetString())
-                        .Where(static r => r != null)
-                        .ToList()!
-                    : new List<string>();
+            var responseData = content["responseData"];
+            var additionalData = content["additionalData"];
+
+            var token = responseData.GetProperty("token").GetString() ?? string.Empty;
+            var roles = responseData
+                .GetProperty("roles")
+                .EnumerateArray()
+                .Select(r => r.GetString())
+                .Where(r => r != null)
+                .ToList()!;
 
             var userData = new
             {
-                Email = responseData["email"]?.ToString() ?? string.Empty,
-                Name = responseData["name"]?.ToString() ?? string.Empty,
+                Id = responseData.GetProperty("id").GetString() ?? string.Empty,
+                Email = responseData.GetProperty("email").GetString() ?? string.Empty,
+                Name = responseData.GetProperty("name").GetString() ?? string.Empty,
                 Roles = roles,
-                DateOfBirth = responseData["dateOfBirth"]?.ToString() ?? string.Empty,
+                StudyCity = additionalData.TryGetProperty("StudyCity", out var city)
+                    ? (City?)city.GetInt32()
+                    : null,
+                Location = additionalData.TryGetProperty("Location", out var location)
+                    ? (Location?)location.GetInt32()
+                    : null,
             };
+
             return (true, token, userData);
         }
 

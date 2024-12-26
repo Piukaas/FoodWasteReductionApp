@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using FoodWasteReduction.Core.Enums;
 using FoodWasteReduction.Core.Validation;
 
 namespace FoodWasteReduction.Core.Entities
@@ -13,6 +14,6 @@ namespace FoodWasteReduction.Core.Entities
         public string StudentNumber { get; set; } = string.Empty;
 
         [Required]
-        public string StudyCity { get; set; } = string.Empty;
+        public City StudyCity { get; set; }
     }
 }

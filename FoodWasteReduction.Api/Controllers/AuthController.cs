@@ -170,25 +170,40 @@ namespace FoodWasteReduction.Api.Controllers
                 var roles = await _userManager.GetRolesAsync(user);
                 var token = GenerateJwtToken(user, roles);
 
-                DateTime? dateOfBirth = null;
+                var responseData = new
+                {
+                    Token = token,
+                    user.Id,
+                    user.Email,
+                    user.Name,
+                    Roles = roles,
+                };
+
+                var additionalData = new Dictionary<string, object>();
+
                 if (roles.Contains("Student"))
                 {
                     var student = await _applicationDbContext.Students?.FirstOrDefaultAsync(s =>
                         s.Id == user.Id
                     )!;
-                    dateOfBirth = student?.DateOfBirth;
+                    if (student != null)
+                    {
+                        additionalData.Add("DateOfBirth", student.DateOfBirth);
+                        additionalData.Add("StudyCity", student.StudyCity);
+                    }
+                }
+                else if (roles.Contains("CanteenStaff"))
+                {
+                    var staff = await _applicationDbContext.CanteenStaff?.FirstOrDefaultAsync(cs =>
+                        cs.Id == user.Id
+                    )!;
+                    if (staff != null)
+                    {
+                        additionalData.Add("Location", staff.Location);
+                    }
                 }
 
-                return Ok(
-                    new
-                    {
-                        Token = token,
-                        user.Email,
-                        user.Name,
-                        Roles = roles,
-                        DateOfBirth = dateOfBirth,
-                    }
-                );
+                return Ok(new { responseData, AdditionalData = additionalData });
             }
 
             ModelState.AddModelError(string.Empty, "Verkeerde login gegevens");
