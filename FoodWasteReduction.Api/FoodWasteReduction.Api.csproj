@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <ItemGroup>
-    <ProjectReference Include="..\FoodWasteReduction.Application\FoodWasteReduction.Application.csproj" />
     <ProjectReference Include="..\FoodWasteReduction.Infrastructure\FoodWasteReduction.Infrastructure.csproj" />
   </ItemGroup>
 

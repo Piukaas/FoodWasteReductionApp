@@ -1,19 +1,15 @@
 using FoodWasteReduction.Web.Models.Auth;
+using FoodWasteReduction.Web.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
 namespace FoodWasteReduction.Web.Controllers
 {
-    public class AuthController : Controller
+    public class AuthController(IAuthService authService, IAuthGuardService authGuardService)
+        : Controller
     {
-        private readonly IAuthService _authService;
-        private readonly IAuthGuardService _authGuardService;
-
-        public AuthController(IAuthService authService, IAuthGuardService authGuardService)
-        {
-            _authService = authService;
-            _authGuardService = authGuardService;
-        }
+        private readonly IAuthService _authService = authService;
+        private readonly IAuthGuardService _authGuardService = authGuardService;
 
         [HttpGet]
         public IActionResult Login()

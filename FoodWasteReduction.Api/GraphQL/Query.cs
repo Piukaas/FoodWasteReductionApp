@@ -16,5 +16,13 @@ namespace FoodWasteReduction.Api.GraphQL
                 .Include(p => p.ReservedBy)
                 .Include(p => p.Canteen)!;
         }
+
+        [UseProjection]
+        [HotChocolate.Data.UseFiltering]
+        [HotChocolate.Data.UseSorting]
+        public IQueryable<Product> GetProducts([Service] ApplicationDbContext context)
+        {
+            return context.Products!;
+        }
     }
 }

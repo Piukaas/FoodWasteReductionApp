@@ -1,3 +1,6 @@
+using FoodWasteReduction.Web.Services;
+using FoodWasteReduction.Web.Services.Interfaces;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
