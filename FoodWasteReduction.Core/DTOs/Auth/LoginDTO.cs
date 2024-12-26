@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace FoodWasteReduction.Core.DTOs.Auth
 {
-    public class LoginDto
+    public class LoginDTO
     {
         [Required]
         [EmailAddress]

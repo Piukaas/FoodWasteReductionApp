@@ -2,6 +2,7 @@ using System.Text.Json.Nodes;
 using FoodWasteReduction.Core.Constants;
 using FoodWasteReduction.Core.Enums;
 using FoodWasteReduction.Web.Attributes;
+using FoodWasteReduction.Web.Models;
 using FoodWasteReduction.Web.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -88,5 +89,85 @@ namespace FoodWasteReduction.Web.Controllers
             var packages = await _packageService.GetPackagesForManagement(canteenId);
             return View(packages);
         }
+
+        [AuthorizeRole(Roles.CanteenStaff)]
+        public async Task<IActionResult> Create()
+        {
+            var products = await _packageService.GetProducts();
+            var canteens = await _canteenService.GetCanteens();
+
+            ViewData["Products"] = products;
+            ViewData["Canteens"] = canteens;
+            return View(new PackageViewModel());
+        }
+
+        [HttpPost]
+        [AuthorizeRole(Roles.CanteenStaff)]
+        public async Task<IActionResult> Create(PackageViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                ViewData["Products"] = await _packageService.GetProducts();
+                ViewData["Canteens"] = await _canteenService.GetCanteens();
+                return View(model);
+            }
+
+            await _packageService.CreatePackage(model);
+            return RedirectToAction(nameof(ManagePackages));
+        }
+
+        [HttpPost]
+        [AuthorizeRole(Roles.CanteenStaff)]
+        public async Task<IActionResult> CreateProduct([FromBody] ProductViewModel model)
+        {
+            try
+            {
+                var product = await _packageService.CreateProduct(model);
+                return Ok(product);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        // [AuthorizeRole(Roles.CanteenStaff)]
+        // public async Task<IActionResult> Edit(int id)
+        // {
+        //     var package = await _packageService.GetPackage(id);
+        //     if (package == null)
+        //         return NotFound();
+
+        //     var model = new PackageViewModel
+        //     {
+        //         Name = package.Name,
+        //         Type = package.Type,
+        //         PickupTime = package.PickupTime,
+        //         ExpiryTime = package.ExpiryTime,
+        //         Price = package.Price,
+        //         Is18Plus = package.Is18Plus,
+        //         CanteenId = package.Canteen?.Id ?? 0,
+        //         ProductIds = package.Products?.Select(p => p.Id).ToList() ?? [],
+        //     };
+
+        //     ViewData["Products"] = await _packageService.GetProducts();
+        //     ViewData["Canteens"] = await _canteenService.GetCanteens();
+        //     return View("Create", model);
+        // }
+
+        // [HttpPost]
+        // [AuthorizeRole(Roles.CanteenStaff)]
+        // public async Task<IActionResult> Edit(int id, PackageViewModel model)
+        // {
+        //     if (!ModelState.IsValid)
+        //     {
+        //         ViewData["Products"] = await _packageService.GetProducts();
+        //         ViewData["Canteens"] = await _canteenService.GetCanteens();
+        //         return View("Create", model);
+        //     }
+
+        //     await _packageService.UpdatePackage(id, model);
+        //     return RedirectToAction(nameof(ManagePackages));
+        // }
     }
 }

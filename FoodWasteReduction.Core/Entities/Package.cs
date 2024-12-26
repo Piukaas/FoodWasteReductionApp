@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using FoodWasteReduction.Core.Entities;
 using FoodWasteReduction.Core.Enums;
 
 namespace FoodWasteReduction.Core.Entities

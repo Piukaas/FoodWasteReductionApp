@@ -1,0 +1,86 @@
+@using FoodWasteReduction.Web.Services
+@using FoodWasteReduction.Web.Services.Interfaces
+@inject IPackageService PackageService
+@inject IAuthGuardService AuthGuardService
+@model PackageViewModel
+@{
+    ViewData["Title"] = "Nieuw Pakket";
+    var token = AuthGuardService.GetToken();
+}
+
+<div class="container mt-4">
+    <h1>@ViewData["Title"]</h1>
+
+    <form asp-action="Create" method="post">
+        <partial name="_Partials/_PackageForm" model="Model" />
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary">Opslaan</button>
+            <a asp-action="ManagePackages" class="btn btn-secondary">Annuleren</a>
+        </div>
+    </form>
+</div>
+
+<partial name="_Partials/_ProductForm" model="new ProductViewModel()" />
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        function previewImage(input) {
+            const preview = document.getElementById('imagePreview');
+            const imageUrl = input.value;
+
+            if (imageUrl) {
+                preview.style.display = 'block';
+                preview.src = imageUrl;
+            } else {
+                preview.style.display = 'none';
+                preview.src = '';
+            }
+
+            preview.onerror = function () {
+                this.style.display = 'none';
+                this.src = '';
+            };
+        }
+
+        async function createProduct() {
+            const form = document.getElementById('productForm');
+            const data = {
+                name: document.getElementById('productName').value,
+                imageUrl: document.getElementById('productImage').value,
+                containsAlcohol: document.getElementById('containsAlcohol').checked
+            };
+
+            try {
+                const response = await fetch('/Packages/CreateProduct', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    const product = await response.json();
+                    const select = document.getElementById('ProductIds');
+                    const option = new Option(
+                        `${product.name} ${product.containsAlcohol ? '(18+)' : ''}`,
+                        product.id
+                    );
+                    select.add(option);
+                    bootstrap.Modal.getInstance(document.getElementById('newProductModal')).hide();
+                    form.reset();
+                } else if (response.status === 401) {
+                    window.location.href = '/Account/Login';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Er is iets misgegaan bij het aanmaken van het product.');
+            }
+        }
+    </script>
+}

@@ -4,7 +4,7 @@ using FoodWasteReduction.Core.Validation;
 
 namespace FoodWasteReduction.Core.DTOs.Auth
 {
-    public class RegisterStudentDto
+    public class RegisterStudentDTO
     {
         [Required]
         [EmailAddress]

@@ -1,0 +1,90 @@
+@using FoodWasteReduction.Core.Entities
+@using FoodWasteReduction.Core.Enums
+@model PackageViewModel
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label"></label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label asp-for="PickupTime" class="form-label"></label>
+                            <input asp-for="PickupTime" class="form-control" type="datetime-local" />
+                            <span asp-validation-for="PickupTime" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label asp-for="ExpiryTime" class="form-label"></label>
+                            <input asp-for="ExpiryTime" class="form-control" type="datetime-local" />
+                            <span asp-validation-for="ExpiryTime" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Price" class="form-label"></label>
+                    <input asp-for="Price" class="form-control" type="number" step="0.01" />
+                    <span asp-validation-for="Price" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Type" class="form-label"></label>
+                    <select asp-for="Type" asp-items="Html.GetEnumSelectList<MealType>()" class="form-select"></select>
+                    <span asp-validation-for="Type" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="CanteenId" class="form-label"></label>
+                    <select asp-for="CanteenId" class="form-select" disabled>
+                        @foreach (var canteen in ViewData["Canteens"] as IEnumerable<Canteen> ??
+                        Enumerable.Empty<Canteen>())
+                        {
+                            <option value="@canteen.Id">@canteen.Location - @canteen.City</option>
+                        }
+                    </select>
+                    <input type="hidden" asp-for="CanteenId" />
+                    <span asp-validation-for="CanteenId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3 form-check">
+                    <input asp-for="Is18Plus" class="form-check-input" disabled />
+                    <input type="hidden" asp-for="Is18Plus" />
+                    <label asp-for="Is18Plus" class="form-check-label"></label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="card-title mb-0">Producten</h5>
+                    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
+                        data-bs-target="#newProductModal">
+                        <i class="bi bi-plus"></i> Nieuw Product
+                    </button>
+                </div>
+
+                <div class="mb-3">
+                    <select asp-for="ProductIds" class="form-select" multiple size="10">
+                        @foreach (var product in ViewData["Products"] as IEnumerable<Product> ??
+                        Enumerable.Empty<Product>())
+                        {
+                            <option value="@product.Id">@product.Name @(product.ContainsAlcohol ? "(18+)" : "")</option>
+                        }
+                    </select>
+                    <span asp-validation-for="ProductIds" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
