@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using FoodWasteReduction.Core.Enums;
+using FoodWasteReduction.Core.Validations;
 
 namespace FoodWasteReduction.Web.Models
 {
@@ -25,11 +26,14 @@ namespace FoodWasteReduction.Web.Models
 
         [Required(ErrorMessage = "Ophaaltijd is verplicht")]
         [Display(Name = "Ophalen vanaf")]
-        public DateTime PickupTime { get; set; }
+        [DataType(DataType.DateTime)]
+        [FutureDate(ErrorMessage = "Ophaaltijd moet in de toekomst liggen")]
+        public DateTime PickupTime { get; set; } =
+            DateTime.Now.Date.AddHours(DateTime.Now.Hour + 1);
 
-        [Required(ErrorMessage = "Vervaltijd is verplicht")]
         [Display(Name = "Ophalen tot")]
-        public DateTime ExpiryTime { get; set; }
+        public DateTime ExpiryTime { get; set; } =
+            DateTime.Now.Date.AddHours(DateTime.Now.Hour + 3);
 
         [Required(ErrorMessage = "Prijs is verplicht")]
         [Range(0, double.MaxValue, ErrorMessage = "Prijs moet positief zijn")]
@@ -39,6 +43,7 @@ namespace FoodWasteReduction.Web.Models
         [Display(Name = "18+ pakket")]
         public bool Is18Plus { get; set; } = false;
 
+        [Required(ErrorMessage = "Kies tenminste 1 product")]
         [Display(Name = "Producten")]
         public List<int> ProductIds { get; set; } = [];
     }

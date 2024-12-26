@@ -16,17 +16,26 @@
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label asp-for="PickupTime" class="form-label"></label>
-                            <input asp-for="PickupTime" class="form-control" type="datetime-local" />
+                            <input asp-for="PickupTime" class="form-control" type="datetime-local"
+                                min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" onchange="updateExpiryTime(this)" />
                             <span asp-validation-for="PickupTime" class="text-danger"></span>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label asp-for="ExpiryTime" class="form-label"></label>
-                            <input asp-for="ExpiryTime" class="form-control" type="datetime-local" />
+                            <input asp-for="ExpiryTime" class="form-control" type="datetime-local" disabled />
                             <span asp-validation-for="ExpiryTime" class="text-danger"></span>
                         </div>
                     </div>
+
+                    <script>
+                        function updateExpiryTime(input) {
+                            const pickupTime = new Date(input.value);
+                            const expiryTime = new Date(pickupTime.getTime() + (3 * 60 * 60 * 1000));
+                            document.querySelector('[name="ExpiryTime"]').value = expiryTime.toISOString().slice(0, 16);
+                        }
+                    </script>
                 </div>
 
                 <div class="mb-3">
@@ -53,12 +62,6 @@
                     <input type="hidden" asp-for="CanteenId" />
                     <span asp-validation-for="CanteenId" class="text-danger"></span>
                 </div>
-
-                <div class="mb-3 form-check">
-                    <input asp-for="Is18Plus" class="form-check-input" disabled />
-                    <input type="hidden" asp-for="Is18Plus" />
-                    <label asp-for="Is18Plus" class="form-check-label"></label>
-                </div>
             </div>
         </div>
     </div>
@@ -75,13 +78,17 @@
                 </div>
 
                 <div class="mb-3">
-                    <select asp-for="ProductIds" class="form-select" multiple size="10">
+                    <select asp-for="ProductIds" class="form-select form-select-lg" multiple size="10"
+                        aria-label="Product selectie">
                         @foreach (var product in ViewData["Products"] as IEnumerable<Product> ??
                         Enumerable.Empty<Product>())
                         {
-                            <option value="@product.Id">@product.Name @(product.ContainsAlcohol ? "(18+)" : "")</option>
+                            <option value="@product.Id">
+                                @product.Name @(product.ContainsAlcohol ? "(18+)" : "")
+                            </option>
                         }
                     </select>
+                    <div class="form-text">Gebruik Ctrl + klik om meerdere producten te selecteren</div>
                     <span asp-validation-for="ProductIds" class="text-danger"></span>
                 </div>
             </div>

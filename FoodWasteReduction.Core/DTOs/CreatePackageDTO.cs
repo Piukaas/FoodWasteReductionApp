@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using FoodWasteReduction.Core.Enums;
+using FoodWasteReduction.Core.Validations;
 
 namespace FoodWasteReduction.Core.DTOs
 {
@@ -18,6 +19,7 @@ namespace FoodWasteReduction.Core.DTOs
         public MealType Type { get; set; }
 
         [Required]
+        [FutureDate]
         public DateTime PickupTime { get; set; }
 
         [Required]
@@ -27,8 +29,9 @@ namespace FoodWasteReduction.Core.DTOs
         [Range(0, double.MaxValue)]
         public decimal Price { get; set; }
 
-        public bool Is18Plus { get; set; }
+        public bool? Is18Plus { get; set; }
 
+        [Required]
         public List<int> ProductIds { get; set; } = [];
     }
 }

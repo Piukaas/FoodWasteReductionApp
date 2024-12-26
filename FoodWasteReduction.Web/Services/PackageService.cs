@@ -1,3 +1,4 @@
+using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using FoodWasteReduction.Core.Entities;
@@ -18,8 +19,10 @@ namespace FoodWasteReduction.Web.Services
         public async Task<Package> CreatePackage(PackageViewModel model)
         {
             var token = _authGuardservice.GetToken();
-            _httpClient.DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                "Bearer",
+                token
+            );
 
             var response = await _httpClient.PostAsJsonAsync("api/Packages", model);
             if (!response.IsSuccessStatusCode)
@@ -32,8 +35,10 @@ namespace FoodWasteReduction.Web.Services
         public async Task<Product> CreateProduct(ProductViewModel model)
         {
             var token = _authGuardservice.GetToken();
-            _httpClient.DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                "Bearer",
+                token
+            );
 
             var response = await _httpClient.PostAsJsonAsync("api/Products", model);
             if (!response.IsSuccessStatusCode)
@@ -46,8 +51,10 @@ namespace FoodWasteReduction.Web.Services
         public async Task<Package> UpdatePackage(int id, PackageViewModel model)
         {
             var token = _authGuardservice.GetToken();
-            _httpClient.DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                "Bearer",
+                token
+            );
 
             var response = await _httpClient.PutAsJsonAsync($"api/Packages/{id}", model);
             if (!response.IsSuccessStatusCode)
@@ -60,8 +67,10 @@ namespace FoodWasteReduction.Web.Services
         public async Task DeletePackage(int id)
         {
             var token = _authGuardservice.GetToken();
-            _httpClient.DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                "Bearer",
+                token
+            );
 
             var response = await _httpClient.DeleteAsync($"api/Packages/{id}");
             if (!response.IsSuccessStatusCode)
