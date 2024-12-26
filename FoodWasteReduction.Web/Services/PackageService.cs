@@ -22,10 +22,10 @@ namespace FoodWasteReduction.Web.Services
                             where: {
                                 reservedById: { eq: null }
                                 "
-                + (city.HasValue ? $", city: {{ eq: {(int)city.Value} }}" : "")
+                + (city.HasValue ? $", city: {{ eq: {city.Value} }}" : "")
                 + @"
                                 "
-                + (type.HasValue ? $", type: {{ eq: {(int)type.Value} }}" : "")
+                + (type.HasValue ? $", type: {{ eq: {type.Value} }}" : "")
                 + @"
                             }
                         ) {

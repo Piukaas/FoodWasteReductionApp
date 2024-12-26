@@ -1,4 +1,8 @@
+@using FoodWasteReduction.Core.Constants
 @using FoodWasteReduction.Core.Entities
+@using FoodWasteReduction.Core.Enums
+@using FoodWasteReduction.Web.Services.Interfaces
+@inject IAuthGuardService AuthGuard
 @model IEnumerable<FoodWasteReduction.Core.Entities.Package>
 @{
     ViewData["Title"] = "Pakketten";
@@ -7,6 +11,40 @@
 
 <div class="container mt-4">
     <h1>@ViewData["Title"]</h1>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label for="city" class="form-label">City</label>
+                    <select name="city" id="city" class="form-select">
+                        <option value="">All Cities</option>
+                        @foreach (var city in Enum.GetValues<City>())
+                        {
+                            <option value="@city" selected="@(ViewData["UserCity"]?.ToString() == city.ToString())">
+                                @city
+                            </option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="type" class="form-label">Meal Type</label>
+                    <select name="type" id="type" class="form-select">
+                        <option value="">All Types</option>
+                        @foreach (var type in Enum.GetValues<MealType>())
+                        {
+                            <option value="@type" selected="@(ViewData["SelectedType"]?.ToString() == type.ToString())">
+                                @type
+                            </option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <div class="row">
         @if (!Model.Any())
@@ -60,7 +98,10 @@
                             </div>
 
                             <div class="d-flex justify-content-end mt-3">
+                    @if (AuthGuard.HasRole(Roles.Student))
+                    {
                                 <button class="btn btn-primary">Reserveer</button>
+                     }
                             </div>
                         </div>
                     </div>

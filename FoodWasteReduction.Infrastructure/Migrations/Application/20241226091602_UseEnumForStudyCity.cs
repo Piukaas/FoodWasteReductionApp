@@ -16,7 +16,8 @@ namespace FoodWasteReduction.Infrastructure.Migrations.Application
                 type: "int",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "nvarchar(max)");
+                oldType: "nvarchar(max)"
+            );
         }
 
         /// <inheritdoc />
@@ -28,7 +29,8 @@ namespace FoodWasteReduction.Infrastructure.Migrations.Application
                 type: "nvarchar(max)",
                 nullable: false,
                 oldClrType: typeof(int),
-                oldType: "int");
+                oldType: "int"
+            );
         }
     }
 }
