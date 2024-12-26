@@ -1,4 +1,5 @@
 using FoodWasteReduction.Core.Entities;
+using FoodWasteReduction.Core.Enums;
 using Xunit;
 
 namespace FoodWasteReduction.Tests
@@ -16,7 +17,7 @@ namespace FoodWasteReduction.Tests
                 DateOfBirth = new DateTime(2000, 1, 1),
                 StudentNumber = "S123456",
                 Email = "john.doe@example.com",
-                StudyCity = "New York",
+                StudyCity = City.Breda,
                 PhoneNumber = "123-456-7890",
             };
 
@@ -26,7 +27,7 @@ namespace FoodWasteReduction.Tests
             Assert.Equal(new DateTime(2000, 1, 1), student.DateOfBirth);
             Assert.Equal("S123456", student.StudentNumber);
             Assert.Equal("john.doe@example.com", student.Email);
-            Assert.Equal("New York", student.StudyCity);
+            Assert.Equal(City.Breda, student.StudyCity);
             Assert.Equal("123-456-7890", student.PhoneNumber);
         }
     }

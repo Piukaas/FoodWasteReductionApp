@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using FoodWasteReduction.Core.Enums;
 using FoodWasteReduction.Core.Validation;
 
 namespace FoodWasteReduction.Core.DTOs.Auth
@@ -20,7 +21,7 @@ namespace FoodWasteReduction.Core.DTOs.Auth
         public DateTime DateOfBirth { get; set; }
 
         [Required]
-        public string StudyCity { get; set; } = string.Empty;
+        public City StudyCity { get; set; }
 
         [Required]
         [MinLength(8)]

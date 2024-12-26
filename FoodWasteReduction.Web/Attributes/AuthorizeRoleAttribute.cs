@@ -1,30 +1,29 @@
+using FoodWasteReduction.Web.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
-public class AuthorizeRoleAttribute : Attribute, IAuthorizationFilter
+namespace FoodWasteReduction.Web.Attributes
 {
-    private readonly string _role;
-
-    public AuthorizeRoleAttribute(string role)
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
+    public class AuthorizeRoleAttribute(params string[] roles) : Attribute, IAuthorizationFilter
     {
-        _role = role;
-    }
+        private readonly string[] _roles = roles;
 
-    public void OnAuthorization(AuthorizationFilterContext context)
-    {
-        var authGuardService =
-            context.HttpContext.RequestServices.GetRequiredService<IAuthGuardService>();
-
-        if (!authGuardService.IsAuthenticated)
+        public void OnAuthorization(AuthorizationFilterContext context)
         {
-            context.Result = new RedirectToActionResult("Login", "Auth", null);
-            return;
-        }
+            var authGuardService =
+                context.HttpContext.RequestServices.GetRequiredService<IAuthGuardService>();
 
-        if (!authGuardService.HasRole(_role))
-        {
-            context.Result = new ForbidResult();
+            if (!authGuardService.IsAuthenticated)
+            {
+                context.Result = new RedirectToActionResult("Login", "Auth", null);
+                return;
+            }
+
+            if (!_roles.Any(role => authGuardService.HasRole(role)))
+            {
+                context.Result = new ForbidResult();
+            }
         }
     }
 }

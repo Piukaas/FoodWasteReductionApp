@@ -13,7 +13,7 @@ html {
 .btn-link.nav-link:focus,
 .form-control:focus,
 .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+  box-shadow: 0 0 0 0.1rem #eeeeee, 0 0 0 0.25rem #258cfb;
 }
 
 html {
@@ -32,20 +32,16 @@ body {
   font-weight: bold;
 }
 
-.form-control {
+.form-control,
+.form-select {
   background-color: #eeeeee;
   border-radius: 25px;
   border: 2px solid black;
   color: black;
 }
 
-.form-control:focus {
-  border-color: #2a6f82;
-  box-shadow: 0 0 0 0.25rem rgba(42, 111, 130, 0.5);
-  outline: 0;
-}
-
-.form-select:focus {
+.form-control,
+.form-select :focus {
   border-color: #2a6f82;
   box-shadow: 0 0 0 0.25rem rgba(42, 111, 130, 0.5);
   outline: 0;
@@ -63,20 +59,20 @@ body {
 .btn-primary {
   background-color: #2a6f82;
   border-color: #2a6f82;
-  color: white;
+  color: #eeeeee;
 }
 
 .btn-primary:hover {
   background-color: #1d4f5d;
   border-color: #1d4f5d;
-  color: white;
+  color: #eeeeee;
 }
 
 .nav-pills .nav-link.active,
 .nav-pills .show > .nav-link {
   background-color: #2a6f82;
   border-color: #2a6f82;
-  color: white;
+  color: #eeeeee;
 }
 
 .nav-link {
@@ -86,6 +82,7 @@ body {
 .nav-link:hover {
   color: #2a6f82 !important;
   text-decoration: underline;
+  cursor: pointer;
 }
 
 a.btn-link {
@@ -106,7 +103,7 @@ a.btn-link:hover {
 .dropdown-item:hover,
 .dropdown-item:focus {
   background-color: #2a6f82;
-  color: white;
+  color: #eeeeee;
 }
 
 .dropdown-menu .dropdown-item {
@@ -133,4 +130,16 @@ a.btn-link:hover {
 .navbar-logo {
   height: 30px;
   margin-right: 10px;
+}
+
+.card {
+  background-color: #eeeeee;
+  border-radius: 25px;
+}
+
+.product-thumbnail {
+  width: fit-content;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 4px;
 }

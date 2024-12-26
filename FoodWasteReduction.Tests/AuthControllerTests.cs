@@ -3,6 +3,7 @@ using FluentAssertions;
 using FoodWasteReduction.Api.Controllers;
 using FoodWasteReduction.Core.DTOs.Auth;
 using FoodWasteReduction.Core.Entities;
+using FoodWasteReduction.Core.Enums;
 using FoodWasteReduction.Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
@@ -99,7 +100,7 @@ namespace FoodWasteReduction.Tests.Controllers
                 Name = "Test User",
                 StudentNumber = "S123456",
                 DateOfBirth = new DateTime(2000, 1, 1),
-                StudyCity = "Test City",
+                StudyCity = City.Breda,
             };
 
             _mockUserManager
@@ -130,7 +131,7 @@ namespace FoodWasteReduction.Tests.Controllers
                 Name = "Test User",
                 StudentNumber = "S123456",
                 DateOfBirth = new DateTime(2000, 1, 1),
-                StudyCity = "Test City",
+                StudyCity = City.Breda,
             };
 
             _mockUserManager
@@ -161,7 +162,7 @@ namespace FoodWasteReduction.Tests.Controllers
                 Name = "Test User",
                 StudentNumber = "S123456",
                 DateOfBirth = DateTime.Now.AddYears(-15), // 15 years old
-                StudyCity = "Test City",
+                StudyCity = City.Breda,
             };
 
             _mockUserManager
@@ -192,7 +193,7 @@ namespace FoodWasteReduction.Tests.Controllers
                 Name = "Test User",
                 StudentNumber = "S123456",
                 DateOfBirth = DateTime.Now.AddDays(1), // Future date
-                StudyCity = "Test City",
+                StudyCity = City.Breda,
             };
 
             _mockUserManager
@@ -224,7 +225,7 @@ namespace FoodWasteReduction.Tests.Controllers
                 Name = "Valid User",
                 StudentNumber = "S123456",
                 DateOfBirth = DateTime.Now.AddYears(-20),
-                StudyCity = "Test City",
+                StudyCity = City.Breda,
                 PhoneNumber = "1234567890",
             };
 
@@ -252,7 +253,7 @@ namespace FoodWasteReduction.Tests.Controllers
                 Password = "ValidPass123!",
                 Name = "Staff User",
                 PersonnelNumber = "P123456",
-                Location = "Main Building",
+                Location = Location.LA,
             };
 
             _mockUserManager
@@ -282,9 +283,12 @@ namespace FoodWasteReduction.Tests.Controllers
                 Name = "Test User",
                 StudentNumber = "S123456",
                 DateOfBirth = DateTime.Now.AddYears(-20),
-                StudyCity = "Test City",
-                PhoneNumber = "1234567890",
+                StudyCity = City.Breda,
             };
+
+            // Setup in-memory database
+            _context.Students?.Add(user);
+            await _context.SaveChangesAsync();
 
             _mockSignInManager
                 .Setup(x =>
@@ -300,7 +304,7 @@ namespace FoodWasteReduction.Tests.Controllers
             _mockUserManager.Setup(x => x.FindByEmailAsync(It.IsAny<string>())).ReturnsAsync(user);
             _mockUserManager
                 .Setup(x => x.GetRolesAsync(It.IsAny<ApplicationUser>()))
-                .ReturnsAsync(new List<string> { "Student" });
+                .ReturnsAsync(["Student"]);
 
             // Act
             var result = await _controller.Login(loginDto);
@@ -308,26 +312,28 @@ namespace FoodWasteReduction.Tests.Controllers
             // Assert
             var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
             okResult.Should().NotBeNull();
+
             var value = okResult.Value.Should().BeAssignableTo<object>().Subject;
             var json = JsonSerializer.Serialize(value);
-            var userInfo = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(json);
+            var response = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(json);
 
-            userInfo.Should().NotBeNull();
-            userInfo.Should().ContainKey("Email");
-            userInfo!["Email"].GetString().Should().Be("test@example.com");
-            userInfo.Should().ContainKey("Name");
-            userInfo!["Name"].GetString().Should().Be("Test User");
-            userInfo.Should().ContainKey("DateOfBirth");
+            response.Should().ContainKey("responseData");
+            var responseData = response!["responseData"];
 
-            if (userInfo["DateOfBirth"].ValueKind != JsonValueKind.Null)
-            {
-                var dateOfBirth = userInfo["DateOfBirth"].GetDateTime();
-                dateOfBirth.Should().Be(user.DateOfBirth);
-            }
+            responseData.TryGetProperty("Token", out var token);
+            token.GetString().Should().NotBeNullOrEmpty();
 
-            var roles = userInfo["Roles"].EnumerateArray().Select(r => r.GetString()).ToList();
-            roles.Should().NotBeNull();
+            responseData.TryGetProperty("Roles", out var rolesElement);
+            var roles = rolesElement.EnumerateArray().Select(r => r.GetString()).ToList();
             roles.Should().Contain("Student");
+
+            // Optional: Check additionalData if present
+            if (response.ContainsKey("AdditionalData"))
+            {
+                var additionalData = response["AdditionalData"];
+                additionalData.TryGetProperty("StudyCity", out var city);
+                city.GetInt32().Should().Be((int)City.Breda);
+            }
         }
     }
 }

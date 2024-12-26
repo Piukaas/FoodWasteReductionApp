@@ -1,67 +1,73 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using FoodWasteReduction.Web.Services.Interfaces;
 
-public class AuthGuardService : IAuthGuardService
+namespace FoodWasteReduction.Web.Services
 {
-    private string? _token;
-    private readonly IHttpContextAccessor _httpContextAccessor;
-
-    public AuthGuardService(IHttpContextAccessor httpContextAccessor)
+    public class AuthGuardService : IAuthGuardService
     {
-        _httpContextAccessor = httpContextAccessor;
-        _token = _httpContextAccessor.HttpContext?.Session.GetString("JWTToken");
-    }
+        private string? _token;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public bool IsAuthenticated => !string.IsNullOrEmpty(GetToken());
-
-    public bool HasRole(string role)
-    {
-        try
+        public AuthGuardService(IHttpContextAccessor httpContextAccessor)
         {
-            var token = GetToken();
-            if (string.IsNullOrEmpty(token))
-                return false;
-
-            var handler = new JwtSecurityTokenHandler();
-            var jwtToken = handler.ReadJwtToken(token);
-
-            var roles = jwtToken.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value);
-
-            return roles.Contains(role);
-        }
-        catch
-        {
-            return false;
-        }
-    }
-
-    public void SetToken(string token)
-    {
-        if (string.IsNullOrEmpty(token))
-            return;
-
-        _token = token;
-        if (_httpContextAccessor.HttpContext != null)
-        {
-            _httpContextAccessor.HttpContext.Session.SetString("JWTToken", token);
-        }
-    }
-
-    public void ClearToken()
-    {
-        _token = null;
-        if (_httpContextAccessor.HttpContext != null)
-        {
-            _httpContextAccessor.HttpContext.Session.Remove("JWTToken");
-        }
-    }
-
-    public string? GetToken()
-    {
-        if (string.IsNullOrEmpty(_token))
-        {
+            _httpContextAccessor = httpContextAccessor;
             _token = _httpContextAccessor.HttpContext?.Session.GetString("JWTToken");
         }
-        return _token;
+
+        public bool IsAuthenticated => !string.IsNullOrEmpty(GetToken());
+
+        public bool HasRole(string role)
+        {
+            try
+            {
+                var token = GetToken();
+                if (string.IsNullOrEmpty(token))
+                    return false;
+
+                var handler = new JwtSecurityTokenHandler();
+                var jwtToken = handler.ReadJwtToken(token);
+
+                var roles = jwtToken
+                    .Claims.Where(c => c.Type == ClaimTypes.Role)
+                    .Select(c => c.Value);
+
+                return roles.Contains(role);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public void SetToken(string token)
+        {
+            if (string.IsNullOrEmpty(token))
+                return;
+
+            _token = token;
+            if (_httpContextAccessor.HttpContext != null)
+            {
+                _httpContextAccessor.HttpContext.Session.SetString("JWTToken", token);
+            }
+        }
+
+        public void ClearToken()
+        {
+            _token = null;
+            if (_httpContextAccessor.HttpContext != null)
+            {
+                _httpContextAccessor.HttpContext.Session.Remove("JWTToken");
+            }
+        }
+
+        public string? GetToken()
+        {
+            if (string.IsNullOrEmpty(_token))
+            {
+                _token = _httpContextAccessor.HttpContext?.Session.GetString("JWTToken");
+            }
+            return _token;
+        }
     }
 }
