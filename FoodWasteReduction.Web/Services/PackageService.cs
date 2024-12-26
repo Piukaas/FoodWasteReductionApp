@@ -72,37 +72,43 @@ namespace FoodWasteReduction.Web.Services
         {
             var query =
                 @"
-            query GetReservedPackages($userId: String) {
-                packages(where: {
-                    reservedById: { eq: $userId }
-                }) {
-                    id
-                    name
-                    price
-                    pickupTime
-                    expiryTime
-                    products {
+                query GetReservedPackages($userId: String) {
+                    packages(where: { reservedById: { eq: $userId } }) {
+                        id
                         name
-                        containsAlcohol
-                        imageUrl
+                        price
+                        pickupTime
+                        expiryTime
+                        is18Plus
+                        type
+                        products {
+                            name
+                            containsAlcohol
+                            imageUrl
+                        }
+                        canteen {
+                            city
+                            location
+                        }
                     }
-                    canteen {
-                        city
-                        location
-                    }
-                    reservedBy {
-                        name
-                        email
-                    }
-                }
-            }";
+                }";
 
             var variables = new { userId };
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                Converters = { new JsonStringEnumConverter() },
+            };
+
             var response = await _httpClient.PostAsJsonAsync("graphql", new { query, variables });
             var content = await response.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<GraphQLResponse<PackagesData>>(content);
 
-            return result?.Data?.Packages ?? [];
+            var result = JsonSerializer.Deserialize<GraphQLResponse<PackagesData>>(
+                content,
+                options
+            );
+            var packages = result?.Data?.Packages ?? [];
+            return packages;
         }
 
         public async Task<IEnumerable<Product>> GetProducts()
