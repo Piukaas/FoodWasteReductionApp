@@ -73,10 +73,15 @@
                                 <small>Locatie: @package.Canteen?.Location - @package.Canteen?.City</small>
                             </p>
 
-                            <button class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#products-@package.Id">
-                                Toon @(package.Products?.Count() ?? 0) @(package.Products?.Count() == 1 ? "product" :
-                        "producten")
-                            </button>
+                            <div class="d-flex align-items-center gap-2">
+                                <button class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#products-@package.Id">
+                                    Toon @(package.Products?.Count() ?? 0) @(package.Products?.Count() == 1 ? "product" : "producten")
+                                </button>
+                                <small class="alert-warning p-2">
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                    Producten kunnen afwijken
+                                </small>
+                            </div>
 
                             <div class="collapse mt-2" id="products-@package.Id">
                                 <div class="card card-body bg-light">

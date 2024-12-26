@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FoodWasteReduction.Web.Controllers
 {
-    public class PackagesController(IPackageService packageService) : Controller
+    public class PackagesController(IPackageService packageService, ICanteenService canteenService)
+        : Controller
     {
         private readonly IPackageService _packageService = packageService;
+        private readonly ICanteenService _canteenService = canteenService;
 
         [AuthorizeRole(Roles.Student)]
         public async Task<IActionResult> Index(City? city = null, MealType? type = null)
@@ -19,7 +21,6 @@ namespace FoodWasteReduction.Web.Controllers
 
             if (!string.IsNullOrEmpty(userData))
             {
-                Console.WriteLine($"UserData from session: {userData}");
                 var jsonObject = JsonNode.Parse(userData);
 
                 var studyCityValue = jsonObject?["StudyCity"]?.GetValue<int>();
@@ -56,6 +57,35 @@ namespace FoodWasteReduction.Web.Controllers
             }
 
             var packages = await _packageService.GetReservedPackages(userId);
+            return View(packages);
+        }
+
+        [AuthorizeRole(Roles.CanteenStaff)]
+        public async Task<IActionResult> ManagePackages(int? canteenId = null)
+        {
+            var canteens = await _canteenService.GetCanteens();
+
+            if (!Request.Query.ContainsKey("canteenId"))
+            {
+                var userData = HttpContext.Session.GetString("UserData");
+                if (!string.IsNullOrEmpty(userData))
+                {
+                    var jsonObject = JsonNode.Parse(userData);
+                    var location = jsonObject?["Location"]?.GetValue<int>();
+                    if (location.HasValue)
+                    {
+                        var staffCanteen = canteens.FirstOrDefault(c =>
+                            (int)c.Location == location.Value
+                        );
+                        canteenId = staffCanteen?.Id;
+                    }
+                }
+            }
+
+            ViewData["Canteens"] = canteens;
+            ViewData["SelectedCanteenId"] = canteenId;
+
+            var packages = await _packageService.GetPackagesForManagement(canteenId);
             return View(packages);
         }
     }

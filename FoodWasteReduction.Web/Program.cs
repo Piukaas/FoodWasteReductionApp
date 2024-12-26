@@ -45,6 +45,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IAuthGuardService, AuthGuardService>();
 builder.Services.AddScoped<IPackageService, PackageService>();
+builder.Services.AddScoped<ICanteenService, CanteenService>();
 
 builder.Services.AddSession(options =>
 {
