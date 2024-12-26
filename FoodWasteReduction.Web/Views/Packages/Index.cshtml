@@ -16,9 +16,9 @@
         <div class="card-body">
             <form method="get" class="row g-3 align-items-end">
                 <div class="col-md-4">
-                    <label for="city" class="form-label">City</label>
+                    <label for="city" class="form-label">Stad</label>
                     <select name="city" id="city" class="form-select">
-                        <option value="">All Cities</option>
+                        <option value="">All steden</option>
                         @foreach (var city in Enum.GetValues<City>())
                         {
                             <option value="@city" selected="@(ViewData["UserCity"]?.ToString() == city.ToString())">
@@ -28,9 +28,9 @@
                     </select>
                 </div>
                 <div class="col-md-4">
-                    <label for="type" class="form-label">Meal Type</label>
+                    <label for="type" class="form-label">Maaltijd type</label>
                     <select name="type" id="type" class="form-select">
-                        <option value="">All Types</option>
+                        <option value="">All maaltijden</option>
                         @foreach (var type in Enum.GetValues<MealType>())
                         {
                             <option value="@type" selected="@(ViewData["SelectedType"]?.ToString() == type.ToString())">
@@ -50,7 +50,7 @@
         @if (!Model.Any())
         {
             <div class="col-12">
-                <p>No packages available at this time.</p>
+                <p>Geen pakketten op het moment beschikbaar.</p>
             </div>
         }
         else
@@ -60,10 +60,15 @@
                 <div class="col-md-4 mb-4">
                     <div class="card shadow-sm">
                         <div class="card-body">
+                            @if (package.Is18Plus)
+                            {
+                                <span class="position-absolute top-0 end-0 badge bg-danger mt-3 me-3">18+</span>
+                            }
                             <h5 class="card-title">@package.Name</h5>
                             <p class="card-text">
                                 <strong>€@package.Price.ToString("F2")</strong><br />
                                 <small>Pickup: @package.PickupTime.ToString("g")</small><br />
+                                <small>Maaltijd: @package.Type</small><br />
                                 <small>Locatie: @package.Canteen?.Location - @package.Canteen?.City</small>
                             </p>
 
@@ -98,10 +103,10 @@
                             </div>
 
                             <div class="d-flex justify-content-end mt-3">
-                    @if (AuthGuard.HasRole(Roles.Student))
-                    {
-                                <button class="btn btn-primary">Reserveer</button>
-                     }
+                                @if (AuthGuard.HasRole(Roles.Student))
+                                {
+                                    <button class="btn btn-primary">Reserveer</button>
+                                }
                             </div>
                         </div>
                     </div>
