@@ -40,7 +40,7 @@ namespace FoodWasteReduction.Api.Controllers
                 CanteenId = dto.CanteenId,
                 Type = dto.Type,
                 PickupTime = dto.PickupTime,
-                ExpiryTime = dto.ExpiryTime,
+                ExpiryTime = dto.PickupTime.AddHours(2),
                 Price = dto.Price,
                 Is18Plus = products.Any(p => p.ContainsAlcohol),
                 Products = products,
@@ -73,16 +73,12 @@ namespace FoodWasteReduction.Api.Controllers
             if (!User.IsInRole("CanteenStaff"))
                 return Forbid();
 
-            var package = await _packageRepository.GetByIdAsync(id);
+            var package = await _packageRepository.GetPackageWithProductsAsync(id);
             if (package == null)
                 return NotFound();
 
             if (package.ReservedById != null)
                 return BadRequest("Cannot update package that is already reserved");
-
-            var canteen = await _canteenRepository.GetByIdAsync(dto.CanteenId);
-            if (canteen == null)
-                return BadRequest("Invalid canteen ID");
 
             var products = await _productRepository.GetProductsByIdsAsync(dto.ProductIds);
             if (products.Count != dto.ProductIds.Count)
@@ -91,7 +87,7 @@ namespace FoodWasteReduction.Api.Controllers
             package.Name = dto.Name;
             package.Type = dto.Type;
             package.PickupTime = dto.PickupTime;
-            package.ExpiryTime = dto.ExpiryTime;
+            package.ExpiryTime = dto.PickupTime.AddHours(2);
             package.Price = dto.Price;
             package.Is18Plus = products.Any(p => p.ContainsAlcohol);
             package.Products = products;

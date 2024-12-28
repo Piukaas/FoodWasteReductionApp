@@ -23,9 +23,6 @@ namespace FoodWasteReduction.Core.DTOs
         public DateTime PickupTime { get; set; }
 
         [Required]
-        public DateTime ExpiryTime { get; set; }
-
-        [Required]
         [Range(0, double.MaxValue)]
         public decimal Price { get; set; }
 

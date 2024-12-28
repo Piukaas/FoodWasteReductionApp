@@ -48,6 +48,13 @@ namespace FoodWasteReduction.Api.Repositories
             return await _context.Packages?.FirstOrDefaultAsync(c => c.Id == id)!;
         }
 
+        public async Task<Package?> GetPackageWithProductsAsync(int packageId)
+        {
+            return await _context
+                .Packages?.Include(p => p.Products)
+                .FirstOrDefaultAsync(p => p.Id == packageId)!;
+        }
+
         public async Task<Package> ReservePackageAsync(Package package, string userId)
         {
             package.ReservedById = userId;
