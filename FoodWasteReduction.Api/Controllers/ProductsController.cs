@@ -1,6 +1,6 @@
+using FoodWasteReduction.Api.Repositories.Interfaces;
 using FoodWasteReduction.Core.DTOs;
 using FoodWasteReduction.Core.Entities;
-using FoodWasteReduction.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,9 +9,9 @@ namespace FoodWasteReduction.Api.Controllers
     [Authorize(Roles = "CanteenStaff")]
     [ApiController]
     [Route("api/[controller]")]
-    public class ProductsController(ApplicationDbContext context) : ControllerBase
+    public class ProductsController(IProductRepository productRepository) : ControllerBase
     {
-        private readonly ApplicationDbContext _context = context;
+        private readonly IProductRepository _productRepository = productRepository;
 
         [HttpPost]
         public async Task<ActionResult<Product>> CreateProduct(CreateProductDTO dto)
@@ -31,9 +31,7 @@ namespace FoodWasteReduction.Api.Controllers
                 ImageUrl = dto.ImageUrl,
             };
 
-            _context.Products?.Add(product);
-            await _context.SaveChangesAsync();
-
+            product = await _productRepository.CreateProductAsync(product);
             return Ok(product);
         }
     }
