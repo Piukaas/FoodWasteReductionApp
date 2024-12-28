@@ -17,11 +17,8 @@ namespace FoodWasteReduction.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<Package>> Create(CreatePackageDTO dto)
         {
-            Console.WriteLine("Create package");
             if (!User.IsInRole("CanteenStaff"))
-            {
                 return Forbid();
-            }
 
             if (_context.Canteens == null)
                 return BadRequest("Canteens context is null");
@@ -64,9 +61,7 @@ namespace FoodWasteReduction.Api.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             if (!User.IsInRole("CanteenStaff"))
-            {
                 return Forbid();
-            }
 
             var package = await _context
                 .Packages?.Include(p => p.Products)
@@ -87,9 +82,7 @@ namespace FoodWasteReduction.Api.Controllers
         public async Task<ActionResult<Package>> Update(int id, CreatePackageDTO dto)
         {
             if (!User.IsInRole("CanteenStaff"))
-            {
                 return Forbid();
-            }
 
             var package = await _context
                 .Packages?.Include(p => p.Products)
