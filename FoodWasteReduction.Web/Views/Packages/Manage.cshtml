@@ -1,7 +1,14 @@
 @using FoodWasteReduction.Core.Entities
 @model IEnumerable<FoodWasteReduction.Core.Entities.Package>
 @{
-    ViewData["Title"] = "Beheer Pakketten";
+    ViewData["Title"] = "Beheer pakketten";
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger" role="alert">
+        @TempData["Error"]
+    </div>
 }
 
 <div class="container mt-4">
@@ -97,7 +104,8 @@
                             </td>
                             <td>
                                 <div class="btn-group">
-                                    @if (package.ReservedBy == null)
+                                    @if (package.ReservedBy == null && ViewData["StaffCanteen"]?.ToString() ==
+                                   package.Canteen?.Id.ToString())
                                     {
                                         <a asp-action="Edit" asp-route-id="@package.Id" class="btn btn-sm btn-outline-primary">
                                             <i class="bi bi-pencil"></i>
@@ -135,7 +143,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuleren</button>
-                    <form asp-action="Delete" asp-route-id="@package.Id" method="post" class="d-inline">
+                    <form asp-action="Delete" asp-route-id="@package.Id" method="post">
                         <button type="submit" class="btn btn-danger">Verwijderen</button>
                     </form>
                 </div>

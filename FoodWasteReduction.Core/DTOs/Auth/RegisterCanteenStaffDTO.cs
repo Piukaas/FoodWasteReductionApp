@@ -3,7 +3,7 @@ using FoodWasteReduction.Core.Enums;
 
 namespace FoodWasteReduction.Core.DTOs.Auth
 {
-    public class RegisterCanteenStaffDto
+    public class RegisterCanteenStaffDTO
     {
         [Required]
         [EmailAddress]

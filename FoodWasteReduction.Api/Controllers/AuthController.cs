@@ -37,7 +37,7 @@ namespace FoodWasteReduction.Api.Controllers
         }
 
         [HttpPost("register/student")]
-        public async Task<IActionResult> RegisterStudent(RegisterStudentDto model)
+        public async Task<IActionResult> RegisterStudent(RegisterStudentDTO model)
         {
             if (!ModelState.IsValid)
             {
@@ -104,7 +104,7 @@ namespace FoodWasteReduction.Api.Controllers
         }
 
         [HttpPost("register/canteenstaff")]
-        public async Task<IActionResult> RegisterCanteenStaff(RegisterCanteenStaffDto model)
+        public async Task<IActionResult> RegisterCanteenStaff(RegisterCanteenStaffDTO model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -146,7 +146,7 @@ namespace FoodWasteReduction.Api.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginDto model)
+        public async Task<IActionResult> Login(LoginDTO model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

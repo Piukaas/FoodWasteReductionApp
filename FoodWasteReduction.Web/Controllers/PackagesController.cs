@@ -2,6 +2,7 @@ using System.Text.Json.Nodes;
 using FoodWasteReduction.Core.Constants;
 using FoodWasteReduction.Core.Enums;
 using FoodWasteReduction.Web.Attributes;
+using FoodWasteReduction.Web.Models;
 using FoodWasteReduction.Web.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -61,22 +62,25 @@ namespace FoodWasteReduction.Web.Controllers
         }
 
         [AuthorizeRole(Roles.CanteenStaff)]
-        public async Task<IActionResult> ManagePackages(int? canteenId = null)
+        public async Task<IActionResult> Manage(int? canteenId = null)
         {
             var canteens = await _canteenService.GetCanteens();
 
-            if (!Request.Query.ContainsKey("canteenId"))
+            var userData = HttpContext.Session.GetString("UserData");
+            if (!string.IsNullOrEmpty(userData))
             {
-                var userData = HttpContext.Session.GetString("UserData");
-                if (!string.IsNullOrEmpty(userData))
+                var jsonObject = JsonNode.Parse(userData);
+                var location = jsonObject?["Location"]?.GetValue<int>();
+                if (location.HasValue)
                 {
-                    var jsonObject = JsonNode.Parse(userData);
-                    var location = jsonObject?["Location"]?.GetValue<int>();
-                    if (location.HasValue)
+                    var staffCanteen = canteens.FirstOrDefault(c =>
+                        (int)c.Location == location.Value
+                    );
+
+                    ViewData["StaffCanteen"] = staffCanteen?.Id;
+
+                    if (!Request.Query.ContainsKey("canteenId"))
                     {
-                        var staffCanteen = canteens.FirstOrDefault(c =>
-                            (int)c.Location == location.Value
-                        );
                         canteenId = staffCanteen?.Id;
                     }
                 }
@@ -87,6 +91,123 @@ namespace FoodWasteReduction.Web.Controllers
 
             var packages = await _packageService.GetPackagesForManagement(canteenId);
             return View(packages);
+        }
+
+        [AuthorizeRole(Roles.CanteenStaff)]
+        public async Task<IActionResult> Create()
+        {
+            ViewData["Products"] = await _packageService.GetProducts();
+            ViewData["Canteens"] = await _canteenService.GetCanteens();
+
+            return View(new PackageViewModel());
+        }
+
+        [HttpPost]
+        [AuthorizeRole(Roles.CanteenStaff)]
+        public async Task<IActionResult> Create(PackageViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                ViewData["Products"] = await _packageService.GetProducts();
+                ViewData["Canteens"] = await _canteenService.GetCanteens();
+                return View(model);
+            }
+
+            try
+            {
+                await _packageService.CreatePackage(model);
+                return RedirectToAction(nameof(Manage));
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                ViewData["Products"] = await _packageService.GetProducts();
+                ViewData["Canteens"] = await _canteenService.GetCanteens();
+                return View(model);
+            }
+        }
+
+        [AuthorizeRole(Roles.CanteenStaff)]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var package = await _packageService.GetPackage(id);
+
+            if (package == null)
+                return NotFound();
+
+            ViewData["Products"] = await _packageService.GetProducts();
+            ViewData["Canteens"] = await _canteenService.GetCanteens();
+
+            var model = new PackageViewModel
+            {
+                Id = package.Id,
+                Name = package.Name,
+                Type = package.Type,
+                City = package.City,
+                PickupTime = package.PickupTime,
+                ExpiryTime = package.ExpiryTime,
+                Price = package.Price,
+                CanteenId = package.Canteen?.Id ?? 0,
+                ProductIds = package.Products?.Select(p => p.Id).ToList() ?? [],
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [AuthorizeRole(Roles.CanteenStaff)]
+        public async Task<IActionResult> Edit(int id, PackageViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                ViewData["Products"] = await _packageService.GetProducts();
+                ViewData["Canteens"] = await _canteenService.GetCanteens();
+                return View(model);
+            }
+
+            try
+            {
+                await _packageService.UpdatePackage(id, model);
+                return RedirectToAction(nameof(Manage));
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                ViewData["Products"] = await _packageService.GetProducts();
+                ViewData["Canteens"] = await _canteenService.GetCanteens();
+                return View(model);
+            }
+        }
+
+        [HttpPost]
+        [AuthorizeRole(Roles.CanteenStaff)]
+        public async Task<IActionResult> Delete(int id)
+        {
+            try
+            {
+                await _packageService.DeletePackage(id);
+                return RedirectToAction(nameof(Manage));
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+                return RedirectToAction(nameof(Manage));
+            }
+        }
+
+        [HttpPost]
+        [AuthorizeRole(Roles.CanteenStaff)]
+        public async Task<IActionResult> CreateProduct([FromBody] ProductViewModel model)
+        {
+            try
+            {
+                var product = await _packageService.CreateProduct(model);
+                return Ok(product);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

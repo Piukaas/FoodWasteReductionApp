@@ -3,11 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FoodWasteReduction.Infrastructure.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        : DbContext(options)
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-            : base(options) { }
-
         public DbSet<Student>? Students { get; set; }
         public DbSet<CanteenStaff>? CanteenStaff { get; set; }
         public DbSet<Canteen>? Canteens { get; set; }

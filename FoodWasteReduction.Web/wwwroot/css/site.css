@@ -68,6 +68,22 @@ body {
   color: #eeeeee;
 }
 
+.btn-outline-primary {
+  background-color: #eeeeee;
+  border-color: #2a6f82;
+  color: #2a6f82;
+}
+
+.btn-outline-primary:hover {
+  background-color: #2a6f82;
+  border-color: #2a6f82;
+  color: #eeeeee;
+}
+
+.btn-outline-danger {
+  background-color: #eeeeee;
+}
+
 .nav-pills .nav-link.active,
 .nav-pills .show > .nav-link {
   background-color: #2a6f82;
@@ -142,4 +158,12 @@ a.btn-link:hover {
   height: 50px;
   object-fit: cover;
   border-radius: 4px;
+}
+
+.image-preview {
+  width: fit-content;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 4px;
+  display: none;
 }

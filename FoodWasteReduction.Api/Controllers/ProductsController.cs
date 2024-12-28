@@ -9,18 +9,18 @@ namespace FoodWasteReduction.Api.Controllers
     [Authorize(Roles = "CanteenStaff")]
     [ApiController]
     [Route("api/[controller]")]
-    public class ProductsController : ControllerBase
+    public class ProductsController(ApplicationDbContext context) : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
-
-        public ProductsController(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        private readonly ApplicationDbContext _context = context;
 
         [HttpPost]
         public async Task<ActionResult<Product>> CreateProduct(CreateProductDTO dto)
         {
+            if (!User.IsInRole("CanteenStaff"))
+            {
+                return Forbid();
+            }
+
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 

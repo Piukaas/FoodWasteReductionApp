@@ -93,7 +93,7 @@ namespace FoodWasteReduction.Tests.Controllers
         public async Task RegisterStudent_WithDuplicateEmail_ReturnsBadRequest()
         {
             // Arrange
-            var registerDto = new RegisterStudentDto
+            var registerDTO = new RegisterStudentDTO
             {
                 Email = "existing@example.com",
                 Password = "ValidPass123!",
@@ -112,7 +112,7 @@ namespace FoodWasteReduction.Tests.Controllers
                 );
 
             // Act
-            var result = await _controller.RegisterStudent(registerDto);
+            var result = await _controller.RegisterStudent(registerDTO);
 
             // Assert
             var badRequestResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
@@ -124,7 +124,7 @@ namespace FoodWasteReduction.Tests.Controllers
         public async Task RegisterStudent_WithShortPassword_ReturnsBadRequest()
         {
             // Arrange
-            var registerDto = new RegisterStudentDto
+            var registerDTO = new RegisterStudentDTO
             {
                 Email = "test@example.com",
                 Password = "short",
@@ -143,7 +143,7 @@ namespace FoodWasteReduction.Tests.Controllers
                 );
 
             // Act
-            var result = await _controller.RegisterStudent(registerDto);
+            var result = await _controller.RegisterStudent(registerDTO);
 
             // Assert
             var badRequestResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
@@ -155,7 +155,7 @@ namespace FoodWasteReduction.Tests.Controllers
         public async Task RegisterStudent_WithUnderageStudent_ReturnsBadRequest()
         {
             // Arrange
-            var registerDto = new RegisterStudentDto
+            var registerDTO = new RegisterStudentDTO
             {
                 Email = "test@example.com",
                 Password = "ValidPass123!",
@@ -170,7 +170,7 @@ namespace FoodWasteReduction.Tests.Controllers
                 .ReturnsAsync(IdentityResult.Success);
 
             // Act
-            var result = await _controller.RegisterStudent(registerDto);
+            var result = await _controller.RegisterStudent(registerDTO);
 
             // Assert
             var badRequestResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
@@ -186,7 +186,7 @@ namespace FoodWasteReduction.Tests.Controllers
         public async Task RegisterStudent_WithFutureBirthDate_ReturnsBadRequest()
         {
             // Arrange
-            var registerDto = new RegisterStudentDto
+            var registerDTO = new RegisterStudentDTO
             {
                 Email = "test@example.com",
                 Password = "ValidPass123!",
@@ -201,7 +201,7 @@ namespace FoodWasteReduction.Tests.Controllers
                 .ReturnsAsync(IdentityResult.Success);
 
             // Act
-            var result = await _controller.RegisterStudent(registerDto);
+            var result = await _controller.RegisterStudent(registerDTO);
 
             // Assert
             var badRequestResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
@@ -218,7 +218,7 @@ namespace FoodWasteReduction.Tests.Controllers
         public async Task RegisterStudent_WithValidData_ReturnsOkResult()
         {
             // Arrange
-            var registerDto = new RegisterStudentDto
+            var registerDTO = new RegisterStudentDTO
             {
                 Email = "valid@example.com",
                 Password = "ValidPass123!",
@@ -237,7 +237,7 @@ namespace FoodWasteReduction.Tests.Controllers
                 .ReturnsAsync(IdentityResult.Success);
 
             // Act
-            var result = await _controller.RegisterStudent(registerDto);
+            var result = await _controller.RegisterStudent(registerDTO);
 
             // Assert
             result.Should().BeOfType<OkResult>();
@@ -247,7 +247,7 @@ namespace FoodWasteReduction.Tests.Controllers
         public async Task RegisterCanteenStaff_WithValidData_ReturnsOkResult()
         {
             // Arrange
-            var registerDto = new RegisterCanteenStaffDto
+            var registerDTO = new RegisterCanteenStaffDTO
             {
                 Email = "staff@example.com",
                 Password = "ValidPass123!",
@@ -264,7 +264,7 @@ namespace FoodWasteReduction.Tests.Controllers
                 .ReturnsAsync(IdentityResult.Success);
 
             // Act
-            var result = await _controller.RegisterCanteenStaff(registerDto);
+            var result = await _controller.RegisterCanteenStaff(registerDTO);
 
             // Assert
             result.Should().BeOfType<OkResult>();
@@ -274,7 +274,7 @@ namespace FoodWasteReduction.Tests.Controllers
         public async Task Login_WithValidCredentials_ReturnsOkResultWithUserInfo()
         {
             // Arrange
-            var loginDto = new LoginDto { Email = "test@example.com", Password = "ValidPass123!" };
+            var loginDTO = new LoginDTO { Email = "test@example.com", Password = "ValidPass123!" };
 
             var user = new Student
             {
@@ -307,7 +307,7 @@ namespace FoodWasteReduction.Tests.Controllers
                 .ReturnsAsync(["Student"]);
 
             // Act
-            var result = await _controller.Login(loginDto);
+            var result = await _controller.Login(loginDTO);
 
             // Assert
             var okResult = result.Should().BeOfType<OkObjectResult>().Subject;

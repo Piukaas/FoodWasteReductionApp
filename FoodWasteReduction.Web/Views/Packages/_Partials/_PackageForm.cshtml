@@ -1,0 +1,117 @@
+@using FoodWasteReduction.Core.Entities
+@using FoodWasteReduction.Core.Enums
+@using System.Text.Json.Nodes
+@model PackageViewModel
+
+@{
+    var userData = Context.Session.GetString("UserData");
+    var userLocation = 0;
+    if (!string.IsNullOrEmpty(userData))
+    {
+        var jsonObject = JsonNode.Parse(userData);
+        userLocation = jsonObject?["Location"]?.GetValue<int>() ?? 0;
+    }
+
+    var userCanteen = (ViewData["Canteens"] as IEnumerable<Canteen>)?.FirstOrDefault(c =>
+    (int)c.Location == userLocation);
+
+    if (userCanteen != null)
+    {
+        Model.City = userCanteen.City;
+        Model.CanteenId = userCanteen.Id;
+    }
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label"></label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label asp-for="PickupTime" class="form-label"></label>
+                            <input asp-for="PickupTime" class="form-control" type="datetime-local"
+                                min="@DateTime.Now.Date.AddHours(DateTime.Now.Hour).ToString("yyyy-MM-ddTHH:mm")"
+                                max="@DateTime.Now.Date.AddDays(2).AddHours(23).AddMinutes(59).ToString("yyyy-MM-ddTHH:mm")"
+                                onchange="updateExpiryTime(this)" />
+                            <span asp-validation-for="PickupTime" class="text-danger"></span>
+                            <div class="form-text">Pakketten kunnen alleen voor de komende 2 dagen gepland worden</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label asp-for="ExpiryTime" class="form-label"></label>
+                            <input asp-for="ExpiryTime" class="form-control" type="datetime-local" disabled />
+                            <span asp-validation-for="ExpiryTime" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <script>
+                        function updateExpiryTime(input) {
+                            const pickupTime = new Date(input.value);
+                            const expiryTime = new Date(pickupTime.getTime() + (3 * 60 * 60 * 1000));
+                            document.querySelector('[name="ExpiryTime"]').value = expiryTime.toISOString().slice(0, 16);
+                        }
+                    </script>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Price" class="form-label"></label>
+                    <input asp-for="Price" class="form-control" type="number" step="0.01" />
+                    <span asp-validation-for="Price" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Type" class="form-label"></label>
+                    <select asp-for="Type" asp-items="Html.GetEnumSelectList<MealType>()" class="form-select"></select>
+                    <span asp-validation-for="Type" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3" style="display:none;">
+                    <input type="hidden" asp-for="City" value="@Model.City" />
+                    <span asp-validation-for="City" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3" style="display:none;">
+                    <input type="hidden" asp-for="CanteenId" value="@Model.CanteenId" />
+                    <span asp-validation-for="CanteenId" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="card-title mb-0">Producten</h5>
+                    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
+                        data-bs-target="#newProductModal">
+                        <i class="bi bi-plus"></i> Nieuw Product
+                    </button>
+                </div>
+
+                <div class="mb-3">
+                    <select asp-for="ProductIds" class="form-select form-select-lg" multiple size="10"
+                        aria-label="Product selectie">
+                        @foreach (var product in ViewData["Products"] as IEnumerable<Product> ??
+                        Enumerable.Empty<Product>())
+                        {
+                            <option value="@product.Id">
+                                @product.Name @(product.ContainsAlcohol ? "(Alcohol)" : "")
+                            </option>
+                        }
+                    </select>
+                    <div class="form-text">Gebruik Ctrl + klik om meerdere producten te selecteren</div>
+                    <span asp-validation-for="ProductIds" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

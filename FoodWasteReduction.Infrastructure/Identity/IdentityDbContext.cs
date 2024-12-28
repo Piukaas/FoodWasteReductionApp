@@ -1,14 +1,10 @@
+using FoodWasteReduction.Core.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using FoodWasteReduction.Core.Entities;
 
 namespace FoodWasteReduction.Infrastructure.Identity
 {
-    public class ApplicationIdentityDbContext : IdentityDbContext<ApplicationUser>
-    {
-        public ApplicationIdentityDbContext(DbContextOptions<ApplicationIdentityDbContext> options)
-            : base(options)
-        {
-        }
-    }
+    public class ApplicationIdentityDbContext(
+        DbContextOptions<ApplicationIdentityDbContext> options
+    ) : IdentityDbContext<ApplicationUser>(options) { }
 }
