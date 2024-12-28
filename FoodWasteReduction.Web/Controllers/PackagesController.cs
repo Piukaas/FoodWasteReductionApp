@@ -128,6 +128,22 @@ namespace FoodWasteReduction.Web.Controllers
 
         [HttpPost]
         [AuthorizeRole(Roles.CanteenStaff)]
+        public async Task<IActionResult> Delete(int id)
+        {
+            try
+            {
+                await _packageService.DeletePackage(id);
+                return RedirectToAction(nameof(ManagePackages));
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+                return RedirectToAction(nameof(ManagePackages));
+            }
+        }
+
+        [HttpPost]
+        [AuthorizeRole(Roles.CanteenStaff)]
         public async Task<IActionResult> CreateProduct([FromBody] ProductViewModel model)
         {
             try
