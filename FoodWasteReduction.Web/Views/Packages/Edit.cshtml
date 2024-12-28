@@ -1,30 +1,22 @@
-@using FoodWasteReduction.Web.Services
-@using FoodWasteReduction.Web.Services.Interfaces
-@using Microsoft.Extensions.Configuration
-@inject IConfiguration Configuration
-@inject IAuthGuardService AuthGuardService
 @model PackageViewModel
 @{
-    ViewData["Title"] = "Nieuw Pakket";
-    var token = AuthGuardService.GetToken();
-    var baseUrl = Configuration["ApiSettings:BaseUrl"];
+    ViewData["Title"] = "Pakket bewerken";
 }
 
 <div class="container mt-4">
     <h1>@ViewData["Title"]</h1>
 
     <form asp-action="Edit" asp-route-id="@Model.Id" method="post">
-        <input type="hidden" asp-for="Id" />
         <partial name="_Partials/_PackageForm" model="Model" />
 
         <div class="mt-4">
             <button type="submit" class="btn btn-primary">Opslaan</button>
-            <a asp-action="ManagePackages" class="btn btn-secondary">Annuleren</a>
+            <a asp-action="Manage" class="btn btn-secondary">Annuleren</a>
         </div>
     </form>
 </div>
 
-<partial name="_Partials/_ProductForm" />
+<partial name="_Partials/_ProductForm" model="new ProductViewModel()" />
 
 @section Scripts {
     @{
@@ -37,7 +29,6 @@
             const imageUrl = input.value;
 
             if (imageUrl) {
-                using System.Security.Principal;
                 preview.style.display = 'block';
                 preview.src = imageUrl;
             } else {

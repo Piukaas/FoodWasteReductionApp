@@ -6,9 +6,9 @@
 
 @if (TempData["Error"] != null)
 {
-        <div class="alert alert-danger" role="alert">
+    <div class="alert alert-danger" role="alert">
         @TempData["Error"]
-        </div>
+    </div>
 }
 
 <div class="container mt-4">
@@ -130,7 +130,7 @@
 
 @foreach (var package in Model)
 {
-      <div class="modal fade" id="deleteModal-@package.Id" tabindex="-1">
+    <div class="modal fade" id="deleteModal-@package.Id" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">

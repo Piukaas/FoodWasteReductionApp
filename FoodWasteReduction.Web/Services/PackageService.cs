@@ -77,6 +77,51 @@ namespace FoodWasteReduction.Web.Services
                 throw new Exception("Failed to delete package");
         }
 
+        public async Task<Package?> GetPackage(int id)
+        {
+            var query =
+                @"
+                query GetPackages($id: Int!) {
+                    packages(where: { id: { eq: $id } }) {
+                        id
+                        name
+                        type
+                        city
+                        pickupTime
+                        expiryTime
+                        price
+                        is18Plus
+                        canteenId
+                        products {
+                            id
+                            name
+                            containsAlcohol
+                        }
+                        canteen {
+                            id
+                            city
+                            location
+                        }
+                    }
+                }";
+
+            var variables = new { id };
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                Converters = { new JsonStringEnumConverter() },
+            };
+
+            var response = await _httpClient.PostAsJsonAsync("graphql", new { query, variables });
+            var content = await response.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<GraphQLResponse<PackagesData>>(
+                content,
+                options
+            );
+
+            return result?.Data?.Packages?.FirstOrDefault();
+        }
+
         public async Task<IEnumerable<Package>> GetAvailablePackages(
             City? city = null,
             MealType? type = null

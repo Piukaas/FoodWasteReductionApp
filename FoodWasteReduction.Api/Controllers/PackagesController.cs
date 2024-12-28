@@ -116,8 +116,6 @@ namespace FoodWasteReduction.Api.Controllers
                 return BadRequest("One or more product IDs are invalid");
 
             package.Name = dto.Name;
-            package.City = dto.City;
-            package.CanteenId = dto.CanteenId;
             package.Type = dto.Type;
             package.PickupTime = dto.PickupTime;
             package.ExpiryTime = dto.ExpiryTime;
