@@ -161,7 +161,7 @@ a.btn-link:hover {
 }
 
 .image-preview {
-  width: 100px;
+  width: fit-content;
   height: 100px;
   object-fit: cover;
   border-radius: 4px;

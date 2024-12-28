@@ -63,7 +63,7 @@
                     const product = await response.json();
                     const select = document.getElementById('ProductIds');
                     const option = new Option(
-                        `${product.name} ${product.containsAlcohol ? '(18+)' : ''}`,
+                        `${product.name} ${product.containsAlcohol ? '(Alcohol)' : ''}`,
                         product.id
                     );
                     select.add(option);
