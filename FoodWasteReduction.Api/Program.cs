@@ -1,6 +1,8 @@
 using System.Text;
 using FoodWasteReduction.Api.GraphQL;
 using FoodWasteReduction.Api.GraphQL.Types;
+using FoodWasteReduction.Api.Repositories;
+using FoodWasteReduction.Api.Repositories.Interfaces;
 using FoodWasteReduction.Core.Entities;
 using FoodWasteReduction.Infrastructure.Data;
 using FoodWasteReduction.Infrastructure.Identity;
@@ -120,6 +122,10 @@ builder.Services.AddSwaggerGen(c =>
         }
     );
 });
+
+builder.Services.AddScoped<IPackageRepository, PackageRepository>();
+builder.Services.AddScoped<ICanteenRepository, CanteenRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
 var app = builder.Build();
 

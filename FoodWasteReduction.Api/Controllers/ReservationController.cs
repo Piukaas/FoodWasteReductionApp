@@ -1,3 +1,4 @@
+using FoodWasteReduction.Api.Repositories.Interfaces;
 using FoodWasteReduction.Core.DTOs;
 using FoodWasteReduction.Core.Entities;
 using FoodWasteReduction.Infrastructure.Data;
@@ -12,11 +13,11 @@ namespace FoodWasteReduction.Api.Controllers
     [ApiController]
     [Authorize(Roles = "Student")]
     public class ReservationController(
-        ApplicationDbContext context,
+        IPackageRepository packageRepository,
         UserManager<ApplicationUser> userManager
     ) : ControllerBase
     {
-        private readonly ApplicationDbContext _context = context;
+        private readonly IPackageRepository _packageRepository = packageRepository;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
 
         [HttpPost]
@@ -25,9 +26,7 @@ namespace FoodWasteReduction.Api.Controllers
             if (!User.IsInRole("Student"))
                 return Forbid();
 
-            var package = await _context
-                .Packages?.Include(p => p.Products)
-                .FirstOrDefaultAsync(p => p.Id == dto.PackageId)!;
+            var package = await _packageRepository.GetPackageWithDetailsAsync(dto.PackageId);
 
             if (package == null)
                 return NotFound("Package not found");
@@ -63,11 +62,12 @@ namespace FoodWasteReduction.Api.Controllers
             }
 
             // Check for existing reservations on same date
-            var existingReservation = await _context.Packages.AnyAsync(p =>
-                p.ReservedById == dto.UserId && p.PickupTime.Date == package.PickupTime.Date
+            var hasExistingReservation = await _packageRepository.HasReservationOnDateAsync(
+                dto.UserId,
+                package.PickupTime
             );
 
-            if (existingReservation)
+            if (hasExistingReservation)
                 return BadRequest(
                     new ErrorResponse
                     {
@@ -76,9 +76,7 @@ namespace FoodWasteReduction.Api.Controllers
                     }
                 );
 
-            package.ReservedById = dto.UserId;
-            await _context.SaveChangesAsync();
-
+            package = await _packageRepository.ReservePackageAsync(package, dto.UserId);
             return Ok(package);
         }
     }

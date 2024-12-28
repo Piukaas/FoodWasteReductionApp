@@ -1,18 +1,23 @@
+using FoodWasteReduction.Api.Repositories.Interfaces;
 using FoodWasteReduction.Core.DTOs;
 using FoodWasteReduction.Core.Entities;
-using FoodWasteReduction.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace FoodWasteReduction.Api.Controllers
 {
     [Authorize(Roles = "CanteenStaff")]
     [ApiController]
     [Route("api/[controller]")]
-    public class PackagesController(ApplicationDbContext context) : ControllerBase
+    public class PackagesController(
+        IPackageRepository packageRepository,
+        ICanteenRepository canteenRepository,
+        IProductRepository productRepository
+    ) : ControllerBase
     {
-        private readonly ApplicationDbContext _context = context;
+        private readonly IPackageRepository _packageRepository = packageRepository;
+        private readonly ICanteenRepository _canteenRepository = canteenRepository;
+        private readonly IProductRepository _productRepository = productRepository;
 
         [HttpPost]
         public async Task<ActionResult<Package>> Create(CreatePackageDTO dto)
@@ -20,21 +25,11 @@ namespace FoodWasteReduction.Api.Controllers
             if (!User.IsInRole("CanteenStaff"))
                 return Forbid();
 
-            if (_context.Canteens == null)
-                return BadRequest("Canteens context is null");
-
-            var canteen = await _context.Canteens.FindAsync(dto.CanteenId);
+            var canteen = await _canteenRepository.GetByIdAsync(dto.CanteenId);
             if (canteen == null)
                 return BadRequest("Invalid canteen ID");
 
-            if (_context.Products == null)
-                return BadRequest("Products context is null");
-
-            var products = await _context
-                .Set<Product>()
-                .Where(p => dto.ProductIds.Contains(p.Id))
-                .ToListAsync();
-
+            var products = await _productRepository.GetProductsByIdsAsync(dto.ProductIds);
             if (products.Count != dto.ProductIds.Count)
                 return BadRequest("One or more product IDs are invalid");
 
@@ -51,9 +46,7 @@ namespace FoodWasteReduction.Api.Controllers
                 Products = products,
             };
 
-            _context.Packages?.Add(package);
-            await _context.SaveChangesAsync();
-
+            package = await _packageRepository.CreatePackageAsync(package);
             return Ok(package);
         }
 
@@ -63,18 +56,14 @@ namespace FoodWasteReduction.Api.Controllers
             if (!User.IsInRole("CanteenStaff"))
                 return Forbid();
 
-            var package = await _context
-                .Packages?.Include(p => p.Products)
-                .FirstOrDefaultAsync(p => p.Id == id)!;
-
+            var package = await _packageRepository.GetByIdAsync(id);
             if (package == null)
                 return NotFound();
 
             if (package.ReservedById != null)
                 return BadRequest("Cannot delete package that is already reserved");
 
-            _context.Packages.Remove(package);
-            await _context.SaveChangesAsync();
+            await _packageRepository.DeletePackageAsync(package);
             return NoContent();
         }
 
@@ -84,27 +73,18 @@ namespace FoodWasteReduction.Api.Controllers
             if (!User.IsInRole("CanteenStaff"))
                 return Forbid();
 
-            var package = await _context
-                .Packages?.Include(p => p.Products)
-                .FirstOrDefaultAsync(p => p.Id == id)!;
-
+            var package = await _packageRepository.GetByIdAsync(id);
             if (package == null)
                 return NotFound();
 
             if (package.ReservedById != null)
                 return BadRequest("Cannot update package that is already reserved");
 
-            if (_context.Canteens == null)
-                return BadRequest("Canteens context is null");
-
-            var canteen = await _context.Canteens.FindAsync(dto.CanteenId);
+            var canteen = await _canteenRepository.GetByIdAsync(dto.CanteenId);
             if (canteen == null)
                 return BadRequest("Invalid canteen ID");
 
-            var products = await _context
-                .Products?.Where(p => dto.ProductIds.Contains(p.Id))
-                .ToListAsync()!;
-
+            var products = await _productRepository.GetProductsByIdsAsync(dto.ProductIds);
             if (products.Count != dto.ProductIds.Count)
                 return BadRequest("One or more product IDs are invalid");
 
@@ -116,7 +96,7 @@ namespace FoodWasteReduction.Api.Controllers
             package.Is18Plus = products.Any(p => p.ContainsAlcohol);
             package.Products = products;
 
-            await _context.SaveChangesAsync();
+            package = await _packageRepository.UpdatePackageAsync(package);
             return Ok(package);
         }
     }

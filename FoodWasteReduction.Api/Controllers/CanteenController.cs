@@ -1,17 +1,16 @@
+using FoodWasteReduction.Api.Repositories.Interfaces;
 using FoodWasteReduction.Core.DTOs;
 using FoodWasteReduction.Core.Entities;
-using FoodWasteReduction.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace FoodWasteReduction.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class CanteensController(ApplicationDbContext context) : ControllerBase
+    public class CanteensController(ICanteenRepository canteenRepository) : ControllerBase
     {
-        private readonly ApplicationDbContext _context = context;
+        private readonly ICanteenRepository _canteenRepository = canteenRepository;
 
         [Authorize(Roles = "CanteenStaff")]
         [HttpPost]
@@ -24,19 +23,14 @@ namespace FoodWasteReduction.Api.Controllers
                 ServesWarmMeals = dto.ServesWarmMeals,
             };
 
-            _context.Canteens?.Add(canteen);
-            await _context.SaveChangesAsync();
-
+            canteen = await _canteenRepository.CreateAsync(canteen);
             return Ok(canteen);
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Canteen>>> GetAll()
         {
-            if (_context.Canteens == null)
-                return NotFound();
-
-            var canteens = await _context.Canteens?.ToListAsync()!;
+            var canteens = await _canteenRepository.GetAllAsync();
             return Ok(canteens);
         }
     }
