@@ -23,7 +23,7 @@ namespace FoodWasteReduction.Web.Models
         [Required(ErrorMessage = "Ophaaltijd is verplicht")]
         [Display(Name = "Ophalen vanaf")]
         [DataType(DataType.DateTime)]
-        [FutureDate(ErrorMessage = "Ophaaltijd moet in de toekomst liggen")]
+        [FutureDate(ErrorMessage = "Ophaaltijd mag maximaal 2 dagen vooruit liggen")]
         public DateTime PickupTime { get; set; } =
             DateTime.Now.Date.AddHours(DateTime.Now.Hour + 1);
 

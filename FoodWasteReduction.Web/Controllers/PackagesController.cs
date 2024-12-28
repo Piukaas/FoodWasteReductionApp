@@ -66,18 +66,21 @@ namespace FoodWasteReduction.Web.Controllers
         {
             var canteens = await _canteenService.GetCanteens();
 
-            if (!Request.Query.ContainsKey("canteenId"))
+            var userData = HttpContext.Session.GetString("UserData");
+            if (!string.IsNullOrEmpty(userData))
             {
-                var userData = HttpContext.Session.GetString("UserData");
-                if (!string.IsNullOrEmpty(userData))
+                var jsonObject = JsonNode.Parse(userData);
+                var location = jsonObject?["Location"]?.GetValue<int>();
+                if (location.HasValue)
                 {
-                    var jsonObject = JsonNode.Parse(userData);
-                    var location = jsonObject?["Location"]?.GetValue<int>();
-                    if (location.HasValue)
+                    var staffCanteen = canteens.FirstOrDefault(c =>
+                        (int)c.Location == location.Value
+                    );
+
+                    ViewData["StaffCanteen"] = staffCanteen?.Id;
+
+                    if (!Request.Query.ContainsKey("canteenId"))
                     {
-                        var staffCanteen = canteens.FirstOrDefault(c =>
-                            (int)c.Location == location.Value
-                        );
                         canteenId = staffCanteen?.Id;
                     }
                 }

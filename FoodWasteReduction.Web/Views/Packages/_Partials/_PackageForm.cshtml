@@ -37,8 +37,11 @@
                         <div class="mb-3">
                             <label asp-for="PickupTime" class="form-label"></label>
                             <input asp-for="PickupTime" class="form-control" type="datetime-local"
-                                min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" onchange="updateExpiryTime(this)" />
+                                min="@DateTime.Now.Date.AddHours(DateTime.Now.Hour).ToString("yyyy-MM-ddTHH:mm")"
+                                max="@DateTime.Now.Date.AddDays(2).AddHours(23).AddMinutes(59).ToString("yyyy-MM-ddTHH:mm")"
+                                onchange="updateExpiryTime(this)" />
                             <span asp-validation-for="PickupTime" class="text-danger"></span>
+                            <div class="form-text">Pakketten kunnen alleen voor de komende 2 dagen gepland worden</div>
                         </div>
                     </div>
                     <div class="col-md-6">

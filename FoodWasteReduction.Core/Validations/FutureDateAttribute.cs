@@ -8,7 +8,9 @@ namespace FoodWasteReduction.Core.Validations
         {
             if (value is DateTime date)
             {
-                return date > DateTime.Now;
+                var now = DateTime.Now;
+                var maxDate = now.AddDays(2);
+                return date > now && date <= maxDate;
             }
             return false;
         }
