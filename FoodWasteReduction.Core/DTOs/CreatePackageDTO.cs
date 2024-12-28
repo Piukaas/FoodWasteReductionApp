@@ -29,8 +29,6 @@ namespace FoodWasteReduction.Core.DTOs
         [Range(0, double.MaxValue)]
         public decimal Price { get; set; }
 
-        public bool? Is18Plus { get; set; }
-
         [Required]
         public List<int> ProductIds { get; set; } = [];
     }

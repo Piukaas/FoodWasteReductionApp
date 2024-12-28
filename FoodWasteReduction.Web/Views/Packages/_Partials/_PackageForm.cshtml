@@ -1,6 +1,26 @@
 @using FoodWasteReduction.Core.Entities
 @using FoodWasteReduction.Core.Enums
+@using System.Text.Json.Nodes
 @model PackageViewModel
+
+@{
+    var userData = Context.Session.GetString("UserData");
+    var userLocation = 0;
+    if (!string.IsNullOrEmpty(userData))
+    {
+        var jsonObject = JsonNode.Parse(userData);
+        userLocation = jsonObject?["Location"]?.GetValue<int>() ?? 0;
+    }
+
+    var userCanteen = (ViewData["Canteens"] as IEnumerable<Canteen>)?.FirstOrDefault(c =>
+    (int)c.Location == userLocation);
+
+    if (userCanteen != null)
+    {
+        Model.City = userCanteen.City;
+        Model.CanteenId = userCanteen.Id;
+    }
+}
 
 <div class="row">
     <div class="col-md-8">
@@ -50,16 +70,13 @@
                     <span asp-validation-for="Type" class="text-danger"></span>
                 </div>
 
-                <div class="mb-3">
-                    <label asp-for="CanteenId" class="form-label"></label>
-                    <select asp-for="CanteenId" class="form-select" disabled>
-                        @foreach (var canteen in ViewData["Canteens"] as IEnumerable<Canteen> ??
-                        Enumerable.Empty<Canteen>())
-                        {
-                            <option value="@canteen.Id">@canteen.Location - @canteen.City</option>
-                        }
-                    </select>
-                    <input type="hidden" asp-for="CanteenId" />
+                <div class="mb-3" style="display:none;">
+                    <input type="hidden" asp-for="City" value="@Model.City" />
+                    <span asp-validation-for="City" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3" style="display:none;">
+                    <input type="hidden" asp-for="CanteenId" value="@Model.CanteenId" />
                     <span asp-validation-for="CanteenId" class="text-danger"></span>
                 </div>
             </div>
@@ -84,7 +101,7 @@
                         Enumerable.Empty<Product>())
                         {
                             <option value="@product.Id">
-                                @product.Name @(product.ContainsAlcohol ? "(18+)" : "")
+                                @product.Name @(product.ContainsAlcohol ? "(Alcohol)" : "")
                             </option>
                         }
                     </select>

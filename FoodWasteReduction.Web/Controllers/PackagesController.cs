@@ -112,8 +112,18 @@ namespace FoodWasteReduction.Web.Controllers
                 return View(model);
             }
 
-            await _packageService.CreatePackage(model);
-            return RedirectToAction(nameof(ManagePackages));
+            try
+            {
+                await _packageService.CreatePackage(model);
+                return RedirectToAction(nameof(ManagePackages));
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                ViewData["Products"] = await _packageService.GetProducts();
+                ViewData["Canteens"] = await _canteenService.GetCanteens();
+                return View(model);
+            }
         }
 
         [HttpPost]

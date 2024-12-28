@@ -17,6 +17,7 @@ namespace FoodWasteReduction.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<Package>> Create(CreatePackageDTO dto)
         {
+            Console.WriteLine("Create package");
             if (!User.IsInRole("CanteenStaff"))
             {
                 return Forbid();

@@ -12,13 +12,9 @@ namespace FoodWasteReduction.Web.Models
         [Display(Name = "Naam")]
         public string Name { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Stad is verplicht")]
-        [Display(Name = "Stad")]
-        public City City { get; set; }
+        public City? City { get; set; }
 
-        [Required(ErrorMessage = "Kantine is verplicht")]
-        [Display(Name = "Kantine")]
-        public int CanteenId { get; set; }
+        public int? CanteenId { get; set; }
 
         [Required(ErrorMessage = "Type is verplicht")]
         [Display(Name = "Type maaltijd")]
@@ -39,9 +35,6 @@ namespace FoodWasteReduction.Web.Models
         [Range(0, double.MaxValue, ErrorMessage = "Prijs moet positief zijn")]
         [Display(Name = "Prijs")]
         public decimal Price { get; set; }
-
-        [Display(Name = "18+ pakket")]
-        public bool Is18Plus { get; set; } = false;
 
         [Required(ErrorMessage = "Kies tenminste 1 product")]
         [Display(Name = "Producten")]
