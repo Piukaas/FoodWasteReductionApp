@@ -174,13 +174,13 @@ namespace FoodWasteReduction.Api.Controllers
             return BadRequest(ModelState);
         }
 
-        public string GenerateJwtToken(ApplicationUser user, IList<string> roles)
+        private string GenerateJwtToken(ApplicationUser user, IList<string> roles)
         {
             var claims = new List<Claim>
             {
-                new(JwtRegisteredClaimNames.Sub, user.Id),
-                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new(ClaimTypes.Name, user.UserName ?? string.Empty),
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(ClaimTypes.Name, user.UserName ?? string.Empty),
             };
 
             claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));

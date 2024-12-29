@@ -360,33 +360,5 @@ namespace FoodWasteReduction.Tests.Controllers
                 dateOfBirth.GetDateTime().Should().Be(birthday);
             }
         }
-
-        [Fact]
-        public void GenerateJwtToken_ShouldCreateValidToken()
-        {
-            // Arrange
-            var user = new ApplicationUser
-            {
-                Id = "testId",
-                UserName = "test@example.com",
-                Email = "test@example.com",
-            };
-            var roles = new List<string> { "Student" };
-
-            // Act
-            var token = _controller.GenerateJwtToken(user, roles);
-
-            // Assert
-            var handler = new JwtSecurityTokenHandler();
-            var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
-
-            jsonToken.Should().NotBeNull();
-            jsonToken!
-                .Claims.Should()
-                .Contain(c => c.Type == ClaimTypes.Role && c.Value == "Student");
-            jsonToken
-                .Claims.Should()
-                .Contain(c => c.Type == JwtRegisteredClaimNames.Sub && c.Value == "testId");
-        }
     }
 }

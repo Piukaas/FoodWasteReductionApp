@@ -20,5 +20,10 @@ namespace FoodWasteReduction.Api.Repositories
             await _context.SaveChangesAsync();
             return product;
         }
+
+        public async Task<List<Product>> GetAllProductsAsync()
+        {
+            return await _context.Products!.ToListAsync();
+        }
     }
 }
