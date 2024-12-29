@@ -12,6 +12,6 @@ namespace FoodWasteReduction.Api.Repositories.Interfaces
         Task<bool> HasReservationOnDateAsync(string userId, DateTime date);
         Task<Package?> GetPackageWithDetailsAsync(int packageId);
         Task<Package> ReservePackageAsync(Package package, string userId);
-        Task<IEnumerable<Package>> GetPackagesAsync();
+        IQueryable<Package> GetPackagesGraphQL();
     }
 }

@@ -18,9 +18,9 @@
                         <option value="">All steden</option>
                         @foreach (var city in Enum.GetValues<City>())
                         {
-                                <option value="@city" selected="@(ViewData["UserCity"]?.ToString() == city.ToString())">
+                            <option value="@city" selected="@(ViewData["UserCity"]?.ToString() == city.ToString())">
                                 @city
-                                </option>
+                            </option>
                         }
                     </select>
                 </div>
@@ -30,9 +30,9 @@
                         <option value="">All maaltijden</option>
                         @foreach (var type in Enum.GetValues<MealType>())
                         {
-                                <option value="@type" selected="@(ViewData["SelectedType"]?.ToString() == type.ToString())">
+                            <option value="@type" selected="@(ViewData["SelectedType"]?.ToString() == type.ToString())">
                                 @type
-                                </option>
+                            </option>
                         }
                     </select>
                 </div>
@@ -46,9 +46,9 @@
     <div class="row">
         @if (!Model.Any())
         {
-                <div class="col-12">
-                    <p>Geen pakketten op het moment beschikbaar.</p>
-                </div>
+            <div class="col-12">
+                <p>Geen pakketten op het moment beschikbaar.</p>
+            </div>
         }
         else
         {
@@ -56,11 +56,11 @@
             {
                 var userDateOfBirth = ViewData["UserDateOfBirth"] as DateTime?;
                 var userAge = userDateOfBirth.HasValue ?
-                    (int)((package.PickupTime - userDateOfBirth.Value).TotalDays / 365.25) : 0;
+                (int)((package.PickupTime - userDateOfBirth.Value).TotalDays / 365.25) : 0;
 
-                        <div class="col-md-4 mb-4">
-                            <div class="card shadow-sm">
-                                <div class="card-body">
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
                             @if (package.Is18Plus)
                             {
                                 <span class="position-absolute top-0 end-0 badge bg-danger mt-3 me-3">18+</span>
@@ -74,8 +74,10 @@
                             </p>
 
                             <div class="d-flex align-items-center gap-2">
-                                <button class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#products-@package.Id">
-                                    Toon @(package.Products?.Count() ?? 0) @(package.Products?.Count() == 1 ? "product" : "producten")
+                                <button class="btn btn-secondary" data-bs-toggle="collapse"
+                                    data-bs-target="#products-@package.Id">
+                                    Toon @(package.Products?.Count() ?? 0) @(package.Products?.Count() == 1 ? "product" :
+                            "producten")
                                 </button>
                                 <small class="alert-warning p-2">
                                     <i class="bi bi-exclamation-triangle"></i>
@@ -87,23 +89,23 @@
                                 <div class="card card-body bg-light">
                                     <h6 class="bold">Producten:</h6>
                                     <ul class="list-unstyled">
-                                @foreach (var product in package.Products ?? Enumerable.Empty<Product>())
-                                {
-                                                <li class="d-flex align-items-center mb-2">
-                                        @if (!string.IsNullOrEmpty(product.ImageUrl))
+                                        @foreach (var product in package.Products ?? Enumerable.Empty<Product>())
                                         {
-                                                            <img src="@product.ImageUrl" class="product-thumbnail me-2" alt="@product.Name"
-                                                                onerror="this.src='';" />
+                                            <li class="d-flex align-items-center mb-2">
+                                                @if (!string.IsNullOrEmpty(product.ImageUrl))
+                                                {
+                                                    <img src="@product.ImageUrl" class="product-thumbnail me-2" alt="@product.Name"
+                                                        onerror="this.src='';" />
+                                                }
+                                                <span>
+                                                    @product.Name
+                                                    @if (product.ContainsAlcohol)
+                                                    {
+                                                        <small class="text-danger ms-1">(Alcohol)</small>
+                                                    }
+                                                </span>
+                                            </li>
                                         }
-                                                    <span>
-                                            @product.Name
-                                            @if (product.ContainsAlcohol)
-                                            {
-                                                                <small class="text-danger ms-1">(Alcohol)</small>
-                                            }
-                                                    </span>
-                                                </li>
-                                }
                                     </ul>
                                 </div>
                             </div>
@@ -111,9 +113,8 @@
                             <div class="d-flex justify-content-end mt-3">
                                 @if (!package.Is18Plus || userAge >= 18)
                                 {
-                                    <button class="btn btn-primary" 
-                                            onclick="reservePackage(@package.Id)" 
-                                            data-package-id="@package.Id">
+                                    <button class="btn btn-primary" onclick="reservePackage(@package.Id)"
+                                        data-package-id="@package.Id">
                                         Reserveer
                                     </button>
                                 }
@@ -154,9 +155,9 @@
             const alertDiv = document.createElement('div');
             alertDiv.className = 'alert alert-danger alert-dismissible fade show';
             alertDiv.innerHTML = `
-                ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            `;
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
             document.querySelector('.container').prepend(alertDiv);
         }
     </script>

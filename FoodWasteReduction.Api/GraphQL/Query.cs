@@ -1,33 +1,32 @@
-using FoodWasteReduction.Api.Repositories.Interfaces;
 using FoodWasteReduction.Core.Entities;
+using FoodWasteReduction.Infrastructure.Data;
 using HotChocolate.Authorization;
+using Microsoft.EntityFrameworkCore;
 
 namespace FoodWasteReduction.Api.GraphQL
 {
     [Authorize]
-    public class Query(IPackageRepository packageRepository, IProductRepository productRepository)
+    public class Query()
     {
-        private readonly IPackageRepository _packageRepository = packageRepository;
-        private readonly IProductRepository _productRepository = productRepository;
-
         [UseProjection]
         [HotChocolate.Data.UseFiltering]
         [HotChocolate.Data.UseSorting]
         [Authorize]
-        public async Task<IQueryable<Package>> GetPackages()
+        public IQueryable<Package> GetPackages([Service] ApplicationDbContext context)
         {
-            var packages = await _packageRepository.GetPackagesAsync();
-            return packages.AsQueryable();
+            return context
+                .Packages?.Include(p => p.Products)
+                .Include(p => p.ReservedBy)
+                .Include(p => p.Canteen)!;
         }
 
         [UseProjection]
         [HotChocolate.Data.UseFiltering]
         [HotChocolate.Data.UseSorting]
         [Authorize]
-        public async Task<IQueryable<Product>> GetProducts()
+        public IQueryable<Product> GetProducts([Service] ApplicationDbContext context)
         {
-            var products = await _productRepository.GetAllProductsAsync();
-            return products.AsQueryable();
+            return context.Products!;
         }
     }
 }

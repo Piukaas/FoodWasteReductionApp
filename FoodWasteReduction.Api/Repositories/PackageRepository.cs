@@ -62,13 +62,12 @@ namespace FoodWasteReduction.Api.Repositories
             return package;
         }
 
-        public async Task<IEnumerable<Package>> GetPackagesAsync()
+        public IQueryable<Package> GetPackagesGraphQL()
         {
-            return await _context
-                .Packages!.Include(p => p.Products)
+            return _context
+                .Packages?.Include(p => p.Products)
                 .Include(p => p.ReservedBy)
-                .Include(p => p.Canteen)
-                .ToListAsync();
+                .Include(p => p.Canteen)!;
         }
     }
 }

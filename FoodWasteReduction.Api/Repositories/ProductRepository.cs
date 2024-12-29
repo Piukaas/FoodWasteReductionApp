@@ -21,9 +21,9 @@ namespace FoodWasteReduction.Api.Repositories
             return product;
         }
 
-        public async Task<List<Product>> GetAllProductsAsync()
+        public IQueryable<Product> GetProductsGraphQL()
         {
-            return await _context.Products!.ToListAsync();
+            return _context.Products!;
         }
     }
 }

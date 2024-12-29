@@ -6,6 +6,6 @@ namespace FoodWasteReduction.Api.Repositories.Interfaces
     {
         Task<List<Product>> GetProductsByIdsAsync(List<int> productIds);
         Task<Product> CreateProductAsync(Product product);
-        Task<List<Product>> GetAllProductsAsync();
+        IQueryable<Product> GetProductsGraphQL();
     }
 }
