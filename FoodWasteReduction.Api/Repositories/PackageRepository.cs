@@ -61,5 +61,14 @@ namespace FoodWasteReduction.Api.Repositories
             await _context.SaveChangesAsync();
             return package;
         }
+
+        public async Task<IEnumerable<Package>> GetPackagesAsync()
+        {
+            return await _context
+                .Packages!.Include(p => p.Products)
+                .Include(p => p.ReservedBy)
+                .Include(p => p.Canteen)
+                .ToListAsync();
+        }
     }
 }

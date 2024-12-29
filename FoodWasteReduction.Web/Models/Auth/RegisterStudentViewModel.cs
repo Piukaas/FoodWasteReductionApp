@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using FoodWasteReduction.Core.Enums;
-using FoodWasteReduction.Core.Validation;
+using FoodWasteReduction.Core.Validations;
 
 namespace FoodWasteReduction.Web.Models.Auth
 {

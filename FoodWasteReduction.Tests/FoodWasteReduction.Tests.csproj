@@ -27,6 +27,7 @@
     <ProjectReference Include="..\FoodWasteReduction.Core\FoodWasteReduction.Core.csproj" />
     <ProjectReference Include="..\FoodWasteReduction.Infrastructure\FoodWasteReduction.Infrastructure.csproj" />
     <ProjectReference Include="..\FoodWasteReduction.Api\FoodWasteReduction.Api.csproj" />
+    <ProjectReference Include="..\FoodWasteReduction.Web\FoodWasteReduction.Web.csproj" />
   </ItemGroup>
 
 </Project>

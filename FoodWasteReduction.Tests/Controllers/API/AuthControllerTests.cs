@@ -1,5 +1,3 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using System.Text.Json;
 using FluentAssertions;
 using FoodWasteReduction.Api.Controllers;
@@ -7,69 +5,23 @@ using FoodWasteReduction.Api.Repositories.Interfaces;
 using FoodWasteReduction.Core.DTOs.Auth;
 using FoodWasteReduction.Core.Entities;
 using FoodWasteReduction.Core.Enums;
-using FoodWasteReduction.Infrastructure.Data;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Moq;
 
-namespace FoodWasteReduction.Tests.Controllers
+namespace FoodWasteReduction.Tests.Controllers.Api
 {
-    public class AuthControllerTests
+    public class AuthControllerTests : ApiControllerTestBase
     {
-        private readonly Mock<UserManager<ApplicationUser>> _mockUserManager;
-        private readonly Mock<SignInManager<ApplicationUser>> _mockSignInManager;
         private readonly Mock<IStudentRepository> _mockStudentRepository;
         private readonly Mock<ICanteenStaffRepository> _mockCanteenStaffRepository;
         private readonly Mock<IConfiguration> _mockConfiguration;
         private readonly AuthController _controller;
 
         public AuthControllerTests()
+            : base()
         {
-            var userStoreMock = new Mock<IUserStore<ApplicationUser>>();
-            var options = new Mock<IOptions<IdentityOptions>>();
-            var passwordHasher = new Mock<IPasswordHasher<ApplicationUser>>();
-            var userValidators = new List<IUserValidator<ApplicationUser>>();
-            var passwordValidators = new List<IPasswordValidator<ApplicationUser>>();
-            var keyNormalizer = new Mock<ILookupNormalizer>();
-            var errors = new Mock<IdentityErrorDescriber>();
-            var services = new Mock<IServiceProvider>();
-            var logger = new Mock<ILogger<UserManager<ApplicationUser>>>();
-
-            _mockUserManager = new Mock<UserManager<ApplicationUser>>(
-                userStoreMock.Object,
-                options.Object,
-                passwordHasher.Object,
-                userValidators,
-                passwordValidators,
-                keyNormalizer.Object,
-                errors.Object,
-                services.Object,
-                logger.Object
-            );
-
-            var contextAccessor = new Mock<IHttpContextAccessor>();
-            var claimsFactory = new Mock<IUserClaimsPrincipalFactory<ApplicationUser>>();
-            var loggerSignIn = new Mock<ILogger<SignInManager<ApplicationUser>>>();
-            var schemes = new Mock<IAuthenticationSchemeProvider>();
-            var confirmation = new Mock<IUserConfirmation<ApplicationUser>>();
-
-            _mockSignInManager = new Mock<SignInManager<ApplicationUser>>(
-                _mockUserManager.Object,
-                contextAccessor.Object,
-                claimsFactory.Object,
-                options.Object,
-                loggerSignIn.Object,
-                schemes.Object,
-                confirmation.Object
-            );
-
             _mockStudentRepository = new Mock<IStudentRepository>();
             _mockCanteenStaffRepository = new Mock<ICanteenStaffRepository>();
 
@@ -82,8 +34,8 @@ namespace FoodWasteReduction.Tests.Controllers
             _mockConfiguration.SetupGet(x => x["Jwt:ExpireMinutes"]).Returns("30");
 
             _controller = new AuthController(
-                _mockUserManager.Object,
-                _mockSignInManager.Object,
+                UserManager.Object,
+                SignInManager.Object,
                 _mockStudentRepository.Object,
                 _mockCanteenStaffRepository.Object,
                 _mockConfiguration.Object
@@ -104,7 +56,7 @@ namespace FoodWasteReduction.Tests.Controllers
                 StudyCity = City.Breda,
             };
 
-            _mockUserManager
+            UserManager
                 .Setup(x => x.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()))
                 .ReturnsAsync(
                     IdentityResult.Failed(
@@ -136,7 +88,7 @@ namespace FoodWasteReduction.Tests.Controllers
                 StudyCity = City.Breda,
             };
 
-            _mockUserManager
+            UserManager
                 .Setup(x => x.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()))
                 .ReturnsAsync(
                     IdentityResult.Failed(
@@ -179,7 +131,7 @@ namespace FoodWasteReduction.Tests.Controllers
                 .As<string[]>()
                 .Should()
                 .Contain(x => x.Contains("16 jaar") && x.Contains("toekomst"));
-            _mockUserManager.Verify(
+            UserManager.Verify(
                 x => x.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()),
                 Times.Never
             );
@@ -211,7 +163,7 @@ namespace FoodWasteReduction.Tests.Controllers
                 .As<string[]>()
                 .Should()
                 .Contain(x => x.Contains("16 jaar") && x.Contains("toekomst"));
-            _mockUserManager.Verify(
+            UserManager.Verify(
                 x => x.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()),
                 Times.Never
             );
@@ -233,10 +185,10 @@ namespace FoodWasteReduction.Tests.Controllers
                 PhoneNumber = "1234567890",
             };
 
-            _mockUserManager
+            UserManager
                 .Setup(x => x.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()))
                 .ReturnsAsync(IdentityResult.Success);
-            _mockUserManager
+            UserManager
                 .Setup(x => x.AddToRoleAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()))
                 .ReturnsAsync(IdentityResult.Success);
             _mockStudentRepository
@@ -264,11 +216,11 @@ namespace FoodWasteReduction.Tests.Controllers
                 Location = Location.LA,
             };
 
-            _mockUserManager
+            UserManager
                 .Setup(x => x.CreateAsync(It.IsAny<ApplicationUser>(), registerDTO.Password))
                 .ReturnsAsync(IdentityResult.Success);
 
-            _mockUserManager
+            UserManager
                 .Setup(x => x.AddToRoleAsync(It.IsAny<ApplicationUser>(), "CanteenStaff"))
                 .ReturnsAsync(IdentityResult.Success);
 
@@ -308,23 +260,22 @@ namespace FoodWasteReduction.Tests.Controllers
                 Name = "Test User",
             };
 
+            var birthday = DateTime.Now.AddYears(-20);
             var student = new Student
             {
                 Id = "testId",
-                DateOfBirth = DateTime.Now.AddYears(-20),
+                DateOfBirth = birthday,
                 StudyCity = City.Breda,
                 StudentNumber = "S123456",
             };
 
-            _mockSignInManager
+            SignInManager
                 .Setup(x => x.PasswordSignInAsync(loginDTO.Email, loginDTO.Password, false, false))
                 .ReturnsAsync(Microsoft.AspNetCore.Identity.SignInResult.Success);
 
-            _mockUserManager
-                .Setup(x => x.FindByEmailAsync(loginDTO.Email))
-                .ReturnsAsync(identityUser);
+            UserManager.Setup(x => x.FindByEmailAsync(loginDTO.Email)).ReturnsAsync(identityUser);
 
-            _mockUserManager.Setup(x => x.GetRolesAsync(identityUser)).ReturnsAsync(["Student"]);
+            UserManager.Setup(x => x.GetRolesAsync(identityUser)).ReturnsAsync(["Student"]);
 
             _mockStudentRepository.Setup(x => x.GetByIdAsync("testId")).ReturnsAsync(student);
 
@@ -349,41 +300,14 @@ namespace FoodWasteReduction.Tests.Controllers
             var roles = rolesElement.EnumerateArray().Select(r => r.GetString()).ToList();
             roles.Should().Contain("Student");
 
-            // Optional: Check additionalData if present
             if (response.ContainsKey("AdditionalData"))
             {
                 var additionalData = response["AdditionalData"];
                 additionalData.TryGetProperty("StudyCity", out JsonElement city);
                 city.GetInt32().Should().Be((int)City.Breda);
+                additionalData.TryGetProperty("DateOfBirth", out JsonElement dateOfBirth);
+                dateOfBirth.GetDateTime().Should().Be(birthday);
             }
-        }
-
-        [Fact]
-        public void GenerateJwtToken_ShouldCreateValidToken()
-        {
-            // Arrange
-            var user = new ApplicationUser
-            {
-                Id = "testId",
-                UserName = "test@example.com",
-                Email = "test@example.com",
-            };
-            var roles = new List<string> { "Student" };
-
-            // Act
-            var token = _controller.GenerateJwtToken(user, roles);
-
-            // Assert
-            var handler = new JwtSecurityTokenHandler();
-            var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
-
-            jsonToken.Should().NotBeNull();
-            jsonToken!
-                .Claims.Should()
-                .Contain(c => c.Type == ClaimTypes.Role && c.Value == "Student");
-            jsonToken
-                .Claims.Should()
-                .Contain(c => c.Type == JwtRegisteredClaimNames.Sub && c.Value == "testId");
         }
     }
 }

@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using FoodWasteReduction.Core.Enums;
+using FoodWasteReduction.Core.Validations;
 
 namespace FoodWasteReduction.Core.Entities
 {
@@ -26,12 +27,14 @@ namespace FoodWasteReduction.Core.Entities
         public MealType Type { get; set; }
 
         [Required]
+        [FutureDate]
         public DateTime PickupTime { get; set; }
 
         [Required]
         public DateTime ExpiryTime { get; set; }
 
         [Required]
+        [Range(0, double.MaxValue)]
         public decimal Price { get; set; }
         public bool Is18Plus { get; set; } = false;
 
