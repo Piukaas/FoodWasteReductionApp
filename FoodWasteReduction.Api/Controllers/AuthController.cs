@@ -2,10 +2,10 @@ using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using FoodWasteReduction.Api.Repositories.Interfaces;
 using FoodWasteReduction.Core.Constants;
 using FoodWasteReduction.Core.DTOs.Auth;
 using FoodWasteReduction.Core.Entities;
-using FoodWasteReduction.Core.Enums;
 using FoodWasteReduction.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -16,91 +16,67 @@ namespace FoodWasteReduction.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AuthController : ControllerBase
+    public class AuthController(
+        UserManager<ApplicationUser> userManager,
+        SignInManager<ApplicationUser> signInManager,
+        IStudentRepository studentRepository,
+        ICanteenStaffRepository canteenStaffRepository,
+        IConfiguration configuration
+    ) : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly ApplicationDbContext _applicationDbContext;
-        private readonly IConfiguration _configuration;
-
-        public AuthController(
-            UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager,
-            ApplicationDbContext applicationDbContext,
-            IConfiguration configuration
-        )
-        {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _applicationDbContext = applicationDbContext;
-            _configuration = configuration;
-        }
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
+        private readonly IStudentRepository _studentRepository = studentRepository;
+        private readonly ICanteenStaffRepository _canteenStaffRepository = canteenStaffRepository;
+        private readonly IConfiguration _configuration = configuration;
 
         [HttpPost("register/student")]
         public async Task<IActionResult> RegisterStudent(RegisterStudentDTO model)
         {
             if (!ModelState.IsValid)
-            {
                 return BadRequest(ModelState);
-            }
 
+            // Validate model
             var validationContext = new ValidationContext(model);
             var validationResults = new List<ValidationResult>();
-            var isValid = Validator.TryValidateObject(
-                model,
-                validationContext,
-                validationResults,
-                true
-            );
-
-            if (!isValid)
+            if (!Validator.TryValidateObject(model, validationContext, validationResults, true))
             {
                 foreach (var validationResult in validationResults)
                 {
                     if (validationResult.ErrorMessage != null)
-                    {
                         ModelState.AddModelError(string.Empty, validationResult.ErrorMessage);
-                    }
                 }
                 return BadRequest(ModelState);
             }
 
-            var user = new Student
+            var identityUser = new ApplicationUser
             {
                 UserName = model.Email,
                 Email = model.Email,
                 Name = model.Name,
-                StudentNumber = model.StudentNumber,
-                DateOfBirth = model.DateOfBirth,
-                StudyCity = model.StudyCity,
                 PhoneNumber = model.PhoneNumber,
             };
 
-            using var transaction = await _applicationDbContext.Database.BeginTransactionAsync();
-            try
+            var result = await _userManager.CreateAsync(identityUser, model.Password);
+            if (!result.Succeeded)
             {
-                var result = await _userManager.CreateAsync(user, model.Password);
-                if (!result.Succeeded)
-                {
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError(string.Empty, error.Description);
-                    }
-                    return BadRequest(ModelState);
-                }
-
-                await _userManager.AddToRoleAsync(user, Roles.Student);
-                _applicationDbContext.Students?.Add(user);
-                await _applicationDbContext.SaveChangesAsync();
-
-                await transaction.CommitAsync();
-                return Ok();
+                foreach (var error in result.Errors)
+                    ModelState.AddModelError(string.Empty, error.Description);
+                return BadRequest(ModelState);
             }
-            catch
+
+            await _userManager.AddToRoleAsync(identityUser, Roles.Student);
+
+            var student = new Student
             {
-                await transaction.RollbackAsync();
-                throw;
-            }
+                Id = identityUser.Id,
+                StudentNumber = model.StudentNumber,
+                DateOfBirth = model.DateOfBirth,
+                StudyCity = model.StudyCity,
+            };
+
+            await _studentRepository.CreateAsync(student);
+            return Ok();
         }
 
         [HttpPost("register/canteenstaff")]
@@ -109,40 +85,32 @@ namespace FoodWasteReduction.Api.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = new CanteenStaff
+            var identityUser = new ApplicationUser
             {
                 UserName = model.Email,
                 Email = model.Email,
                 Name = model.Name,
+            };
+
+            var result = await _userManager.CreateAsync(identityUser, model.Password);
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors)
+                    ModelState.AddModelError(string.Empty, error.Description);
+                return BadRequest(ModelState);
+            }
+
+            await _userManager.AddToRoleAsync(identityUser, Roles.CanteenStaff);
+
+            var canteenStaff = new CanteenStaff
+            {
+                Id = identityUser.Id,
                 PersonnelNumber = model.PersonnelNumber,
                 Location = model.Location,
             };
 
-            using var transaction = await _applicationDbContext.Database.BeginTransactionAsync();
-            try
-            {
-                var result = await _userManager.CreateAsync(user, model.Password);
-                if (!result.Succeeded)
-                {
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError(string.Empty, error.Description);
-                    }
-                    return BadRequest(ModelState);
-                }
-
-                await _userManager.AddToRoleAsync(user, Roles.CanteenStaff);
-                _applicationDbContext.CanteenStaff?.Add(user);
-                await _applicationDbContext.SaveChangesAsync();
-
-                await transaction.CommitAsync();
-                return Ok();
-            }
-            catch
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
+            await _canteenStaffRepository.CreateAsync(canteenStaff);
+            return Ok();
         }
 
         [HttpPost("login")]
@@ -183,9 +151,7 @@ namespace FoodWasteReduction.Api.Controllers
 
                 if (roles.Contains("Student"))
                 {
-                    var student = await _applicationDbContext.Students?.FirstOrDefaultAsync(s =>
-                        s.Id == user.Id
-                    )!;
+                    var student = await _studentRepository.GetByIdAsync(user.Id);
                     if (student != null)
                     {
                         additionalData.Add("DateOfBirth", student.DateOfBirth);
@@ -194,9 +160,7 @@ namespace FoodWasteReduction.Api.Controllers
                 }
                 else if (roles.Contains("CanteenStaff"))
                 {
-                    var staff = await _applicationDbContext.CanteenStaff?.FirstOrDefaultAsync(cs =>
-                        cs.Id == user.Id
-                    )!;
+                    var staff = await _canteenStaffRepository.GetByIdAsync(user.Id);
                     if (staff != null)
                     {
                         additionalData.Add("Location", staff.Location);
@@ -210,13 +174,13 @@ namespace FoodWasteReduction.Api.Controllers
             return BadRequest(ModelState);
         }
 
-        private string GenerateJwtToken(ApplicationUser user, IList<string> roles)
+        public string GenerateJwtToken(ApplicationUser user, IList<string> roles)
         {
             var claims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.Name, user.UserName ?? string.Empty),
+                new(JwtRegisteredClaimNames.Sub, user.Id),
+                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new(ClaimTypes.Name, user.UserName ?? string.Empty),
             };
 
             claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
