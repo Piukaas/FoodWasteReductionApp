@@ -1,6 +1,7 @@
 using FluentAssertions;
 using FoodWasteReduction.Api.Repositories;
 using FoodWasteReduction.Core.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace FoodWasteReduction.Tests.Repositories
 {
@@ -61,16 +62,19 @@ namespace FoodWasteReduction.Tests.Repositories
         }
 
         [Fact]
-        public async Task GetAllProductsAsync_ReturnsAllProducts()
+        public async Task GetProductsGraphQL_ReturnsAllProducts()
         {
             // Arrange
             var products = await CreateTestProducts();
 
             // Act
-            var result = await _repository.GetAllProductsAsync();
+            var result = _repository.GetProductsGraphQL();
+            result.Should().BeAssignableTo<IQueryable<Product>>();
 
             // Assert
-            result.Should().HaveCount(products.Count);
+            (await result.ToListAsync())
+                .Should()
+                .HaveCount(products.Count);
         }
     }
 }
