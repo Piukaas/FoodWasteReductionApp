@@ -112,6 +112,12 @@ namespace FoodWasteReduction.Web.Services
                 Converters = { new JsonStringEnumConverter() },
             };
 
+            var token = _authGuardservice.GetToken();
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                "Bearer",
+                token
+            );
+
             var response = await _httpClient.PostAsJsonAsync("graphql", new { query, variables });
             var content = await response.Content.ReadAsStringAsync();
             var result = JsonSerializer.Deserialize<GraphQLResponse<PackagesData>>(
@@ -167,6 +173,12 @@ namespace FoodWasteReduction.Web.Services
                 Converters = { new JsonStringEnumConverter() },
             };
 
+            var token = _authGuardservice.GetToken();
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                "Bearer",
+                token
+            );
+
             var response = await _httpClient.PostAsJsonAsync("graphql", new { query });
             var content = await response.Content.ReadAsStringAsync();
             var result = JsonSerializer.Deserialize<GraphQLResponse<PackagesData>>(
@@ -211,6 +223,12 @@ namespace FoodWasteReduction.Web.Services
                 PropertyNameCaseInsensitive = true,
                 Converters = { new JsonStringEnumConverter() },
             };
+
+            var token = _authGuardservice.GetToken();
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                "Bearer",
+                token
+            );
 
             var response = await _httpClient.PostAsJsonAsync("graphql", new { query, variables });
             var content = await response.Content.ReadAsStringAsync();
@@ -263,6 +281,12 @@ namespace FoodWasteReduction.Web.Services
                 Converters = { new JsonStringEnumConverter() },
             };
 
+            var token = _authGuardservice.GetToken();
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                "Bearer",
+                token
+            );
+
             var response = await _httpClient.PostAsJsonAsync("graphql", new { query });
             var content = await response.Content.ReadAsStringAsync();
             var result = JsonSerializer.Deserialize<GraphQLResponse<PackagesData>>(
@@ -292,6 +316,12 @@ namespace FoodWasteReduction.Web.Services
                 PropertyNameCaseInsensitive = true,
                 Converters = { new JsonStringEnumConverter() },
             };
+
+            var token = _authGuardservice.GetToken();
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                "Bearer",
+                token
+            );
 
             var response = await _httpClient.PostAsJsonAsync("graphql", new { query });
             var content = await response.Content.ReadAsStringAsync();

@@ -17,17 +17,6 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 
-builder
-    .Services.AddGraphQLServer()
-    .AddQueryType<Query>()
-    .AddType<PackageType>()
-    .AddType<ProductType>()
-    .AddType<CityType>()
-    .AddType<MealTypeType>()
-    .AddFiltering()
-    .AddSorting()
-    .AddProjections();
-
 if (builder.Environment.IsDevelopment())
 {
     builder.Configuration.AddUserSecrets<Program>();
@@ -87,7 +76,23 @@ builder
         };
     });
 
-// Update Swagger configuration
+// Add GraphQL server
+builder
+    .Services.AddGraphQLServer()
+    .AddAuthorization()
+    .AddDefaultTransactionScopeHandler()
+    .AddQueryType<Query>()
+    .AddType<PackageType>()
+    .AddType<ProductType>()
+    .AddType<CityType>()
+    .AddType<MealTypeType>()
+    .AddFiltering()
+    .AddSorting()
+    .AddProjections();
+
+builder.Services.AddHttpContextAccessor();
+
+// Add Swagger configuration
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "FoodWasteReduction API", Version = "v1" });
