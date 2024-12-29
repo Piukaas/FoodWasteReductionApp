@@ -132,6 +132,7 @@ builder.Services.AddScoped<IPackageRepository, PackageRepository>();
 builder.Services.AddScoped<ICanteenRepository, CanteenRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
+builder.Services.AddScoped<ICanteenStaffRepository, CanteenStaffRepository>();
 
 var app = builder.Build();
 

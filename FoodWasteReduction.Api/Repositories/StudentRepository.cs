@@ -16,7 +16,19 @@ namespace FoodWasteReduction.Api.Repositories
 
         public async Task<Student?> GetByIdAsync(string id)
         {
-            return await _context.Students?.FirstOrDefaultAsync(s => s.Id == id)!;
+            return await _context.Students!.FirstOrDefaultAsync(s => s.Id == id);
+        }
+
+        public async Task<Student> CreateAsync(Student student)
+        {
+            await _context.Students!.AddAsync(student);
+            await _context.SaveChangesAsync();
+            return student;
+        }
+
+        public async Task<Student?> GetStudentWithDetailsAsync(string userId)
+        {
+            return await _context.Students!.FirstOrDefaultAsync(s => s.Id == userId);
         }
     }
 }
