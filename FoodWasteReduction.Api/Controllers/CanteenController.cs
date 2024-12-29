@@ -16,6 +16,9 @@ namespace FoodWasteReduction.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<Canteen>> Create(CreateCanteenDTO dto)
         {
+            if (!User.IsInRole("CanteenStaff"))
+                return Forbid();
+
             var canteen = new Canteen
             {
                 City = dto.City,
