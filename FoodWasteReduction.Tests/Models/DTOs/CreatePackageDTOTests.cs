@@ -16,7 +16,7 @@ namespace FoodWasteReduction.Tests.Models.DTOs
                 CanteenId = 1,
                 Type = MealType.Warm,
                 PickupTime = DateTime.Now.AddHours(1),
-                Price = 5.99m,
+                Price = 5.95m,
                 ProductIds = [1, 2, 3],
             };
         }

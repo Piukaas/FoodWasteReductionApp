@@ -5,7 +5,7 @@ namespace FoodWasteReduction.Web.Models.Auth
     public class LoginViewModel
     {
         [Required(ErrorMessage = "E-mail is verplicht")]
-        [EmailAddress(ErrorMessage = "Invalid email address")]
+        [EmailAddress(ErrorMessage = "Ongeldig e-mailadres")]
         [Display(Name = "E-mail")]
         public string Email { get; set; } = string.Empty;
 
