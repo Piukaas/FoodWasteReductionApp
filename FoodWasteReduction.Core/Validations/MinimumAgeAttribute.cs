@@ -1,15 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace FoodWasteReduction.Core.Validation
+namespace FoodWasteReduction.Core.Validations
 {
-    public class MinimumAgeAttribute : ValidationAttribute
+    public class MinimumAgeAttribute(int minimumAge) : ValidationAttribute
     {
-        private readonly int _minimumAge;
-
-        public MinimumAgeAttribute(int minimumAge)
-        {
-            _minimumAge = minimumAge;
-        }
+        private readonly int _minimumAge = minimumAge;
 
         protected override ValidationResult? IsValid(
             object? value,

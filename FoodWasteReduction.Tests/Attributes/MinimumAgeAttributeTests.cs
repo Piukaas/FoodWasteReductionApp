@@ -1,28 +1,82 @@
-using FoodWasteReduction.Core.Validation;
+using System.ComponentModel.DataAnnotations;
+using FluentAssertions;
+using FoodWasteReduction.Core.Validations;
 
 namespace FoodWasteReduction.Tests.Attributes
 {
     public class MinimumAgeAttributeTests
     {
-        [Theory]
-        [InlineData(18, "2000-01-01", true)] // Person is over 18
-        [InlineData(18, "2010-01-01", false)] // Person is under 18
-        [InlineData(18, "2050-01-01", false)] // Future date
-        public void MinimumAge_Validation_Works_Correctly(
-            int minimumAge,
-            string dateString,
-            bool shouldBeValid
-        )
+        private readonly MinimumAgeAttribute _attribute;
+        private readonly ValidationContext _validationContext;
+
+        public MinimumAgeAttributeTests()
         {
-            // Arrange
-            var attribute = new MinimumAgeAttribute(minimumAge);
-            var dateOfBirth = DateTime.Parse(dateString);
+            _attribute = new MinimumAgeAttribute(16);
+            _validationContext = new ValidationContext(new object());
+        }
 
-            // Act
-            var result = attribute.IsValid(dateOfBirth);
+        [Fact]
+        public void IsValid_WithNullValue_ReturnsSuccess()
+        {
+            var result = _attribute.GetValidationResult(null, _validationContext);
+            result.Should().Be(ValidationResult.Success);
+        }
 
-            // Assert
-            Assert.Equal(shouldBeValid, result);
+        [Fact]
+        public void IsValid_WithFutureDate_ReturnsError()
+        {
+            var futureDate = DateTime.Today.AddDays(1);
+            var result = _attribute.GetValidationResult(futureDate, _validationContext);
+
+            result.Should().NotBeNull();
+            result!.ErrorMessage.Should().Contain("toekomst");
+        }
+
+        [Fact]
+        public void IsValid_WithAgeBelowMinimum_ReturnsError()
+        {
+            var dateOfBirth = DateTime.Today.AddYears(-15);
+            var result = _attribute.GetValidationResult(dateOfBirth, _validationContext);
+
+            result.Should().NotBeNull();
+            result!.ErrorMessage.Should().Contain("16 jaar");
+        }
+
+        [Fact]
+        public void IsValid_WithAgeEqualToMinimum_ReturnsSuccess()
+        {
+            var dateOfBirth = DateTime.Today.AddYears(-16);
+            var result = _attribute.GetValidationResult(dateOfBirth, _validationContext);
+
+            result.Should().Be(ValidationResult.Success);
+        }
+
+        [Fact]
+        public void IsValid_WithAgeAboveMinimum_ReturnsSuccess()
+        {
+            var dateOfBirth = DateTime.Today.AddYears(-20);
+            var result = _attribute.GetValidationResult(dateOfBirth, _validationContext);
+
+            result.Should().Be(ValidationResult.Success);
+        }
+
+        [Fact]
+        public void IsValid_WithBirthdayToday_CalculatesCorrectAge()
+        {
+            var dateOfBirth = DateTime.Today.AddYears(-16);
+            var result = _attribute.GetValidationResult(dateOfBirth, _validationContext);
+
+            result.Should().Be(ValidationResult.Success);
+        }
+
+        [Fact]
+        public void IsValid_WithBirthdayTomorrow_CalculatesCorrectAge()
+        {
+            var dateOfBirth = DateTime.Today.AddYears(-16).AddDays(1);
+            var result = _attribute.GetValidationResult(dateOfBirth, _validationContext);
+
+            result.Should().NotBeNull();
+            result!.ErrorMessage.Should().Contain("16 jaar");
         }
     }
 }
