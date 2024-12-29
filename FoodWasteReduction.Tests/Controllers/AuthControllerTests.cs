@@ -308,10 +308,11 @@ namespace FoodWasteReduction.Tests.Controllers
                 Name = "Test User",
             };
 
+            var birthday = DateTime.Now.AddYears(-20);
             var student = new Student
             {
                 Id = "testId",
-                DateOfBirth = DateTime.Now.AddYears(-20),
+                DateOfBirth = birthday,
                 StudyCity = City.Breda,
                 StudentNumber = "S123456",
             };
@@ -355,6 +356,8 @@ namespace FoodWasteReduction.Tests.Controllers
                 var additionalData = response["AdditionalData"];
                 additionalData.TryGetProperty("StudyCity", out JsonElement city);
                 city.GetInt32().Should().Be((int)City.Breda);
+                additionalData.TryGetProperty("DateOfBirth", out JsonElement dateOfBirth);
+                dateOfBirth.GetDateTime().Should().Be(birthday);
             }
         }
 
