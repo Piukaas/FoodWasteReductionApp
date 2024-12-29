@@ -1,5 +1,3 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using System.Text.Json;
 using FluentAssertions;
 using FoodWasteReduction.Api.Controllers;
@@ -7,19 +5,16 @@ using FoodWasteReduction.Api.Repositories.Interfaces;
 using FoodWasteReduction.Core.DTOs.Auth;
 using FoodWasteReduction.Core.Entities;
 using FoodWasteReduction.Core.Enums;
-using FoodWasteReduction.Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 
-namespace FoodWasteReduction.Tests.Controllers
+namespace FoodWasteReduction.Tests.Controllers.API
 {
     public class AuthControllerTests
     {

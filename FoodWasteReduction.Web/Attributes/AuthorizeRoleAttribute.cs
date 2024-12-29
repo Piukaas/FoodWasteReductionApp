@@ -20,7 +20,7 @@ namespace FoodWasteReduction.Web.Attributes
                 return;
             }
 
-            if (!_roles.Any(role => authGuardService.HasRole(role)))
+            if (!_roles.Any(authGuardService.HasRole))
             {
                 context.Result = new ForbidResult();
             }
