@@ -40,60 +40,56 @@ namespace FoodWasteReduction.Api.Controllers
         public async Task<IActionResult> RegisterStudent(RegisterStudentDTO model)
         {
             if (!ModelState.IsValid)
-            {
                 return BadRequest(ModelState);
-            }
 
+            // Validate model
             var validationContext = new ValidationContext(model);
             var validationResults = new List<ValidationResult>();
-            var isValid = Validator.TryValidateObject(
-                model,
-                validationContext,
-                validationResults,
-                true
-            );
-
-            if (!isValid)
+            if (!Validator.TryValidateObject(model, validationContext, validationResults, true))
             {
                 foreach (var validationResult in validationResults)
                 {
                     if (validationResult.ErrorMessage != null)
-                    {
                         ModelState.AddModelError(string.Empty, validationResult.ErrorMessage);
-                    }
                 }
                 return BadRequest(ModelState);
             }
 
-            var user = new Student
-            {
-                UserName = model.Email,
-                Email = model.Email,
-                Name = model.Name,
-                StudentNumber = model.StudentNumber,
-                DateOfBirth = model.DateOfBirth,
-                StudyCity = model.StudyCity,
-                PhoneNumber = model.PhoneNumber,
-            };
-
             using var transaction = await _applicationDbContext.Database.BeginTransactionAsync();
             try
             {
-                var result = await _userManager.CreateAsync(user, model.Password);
+                // Create identity user
+                var identityUser = new ApplicationUser
+                {
+                    UserName = model.Email,
+                    Email = model.Email,
+                    Name = model.Name,
+                    PhoneNumber = model.PhoneNumber,
+                };
+
+                var result = await _userManager.CreateAsync(identityUser, model.Password);
                 if (!result.Succeeded)
                 {
                     foreach (var error in result.Errors)
-                    {
                         ModelState.AddModelError(string.Empty, error.Description);
-                    }
                     return BadRequest(ModelState);
                 }
 
-                await _userManager.AddToRoleAsync(user, Roles.Student);
-                _applicationDbContext.Students?.Add(user);
-                await _applicationDbContext.SaveChangesAsync();
+                await _userManager.AddToRoleAsync(identityUser, Roles.Student);
 
+                // Create domain entity
+                var student = new Student
+                {
+                    Id = identityUser.Id,
+                    StudentNumber = model.StudentNumber,
+                    DateOfBirth = model.DateOfBirth,
+                    StudyCity = model.StudyCity,
+                };
+
+                _applicationDbContext.Students?.Add(student);
+                await _applicationDbContext.SaveChangesAsync();
                 await transaction.CommitAsync();
+
                 return Ok();
             }
             catch
@@ -109,33 +105,39 @@ namespace FoodWasteReduction.Api.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = new CanteenStaff
-            {
-                UserName = model.Email,
-                Email = model.Email,
-                Name = model.Name,
-                PersonnelNumber = model.PersonnelNumber,
-                Location = model.Location,
-            };
-
             using var transaction = await _applicationDbContext.Database.BeginTransactionAsync();
             try
             {
-                var result = await _userManager.CreateAsync(user, model.Password);
+                // Create identity user
+                var identityUser = new ApplicationUser
+                {
+                    UserName = model.Email,
+                    Email = model.Email,
+                    Name = model.Name,
+                };
+
+                var result = await _userManager.CreateAsync(identityUser, model.Password);
                 if (!result.Succeeded)
                 {
                     foreach (var error in result.Errors)
-                    {
                         ModelState.AddModelError(string.Empty, error.Description);
-                    }
                     return BadRequest(ModelState);
                 }
 
-                await _userManager.AddToRoleAsync(user, Roles.CanteenStaff);
-                _applicationDbContext.CanteenStaff?.Add(user);
-                await _applicationDbContext.SaveChangesAsync();
+                await _userManager.AddToRoleAsync(identityUser, Roles.CanteenStaff);
 
+                // Create domain entity
+                var canteenStaff = new CanteenStaff
+                {
+                    Id = identityUser.Id,
+                    PersonnelNumber = model.PersonnelNumber,
+                    Location = model.Location,
+                };
+
+                _applicationDbContext.CanteenStaff?.Add(canteenStaff);
+                await _applicationDbContext.SaveChangesAsync();
                 await transaction.CommitAsync();
+
                 return Ok();
             }
             catch

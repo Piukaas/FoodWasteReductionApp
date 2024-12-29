@@ -1,11 +1,9 @@
 using FoodWasteReduction.Api.Repositories.Interfaces;
 using FoodWasteReduction.Core.DTOs;
 using FoodWasteReduction.Core.Entities;
-using FoodWasteReduction.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace FoodWasteReduction.Api.Controllers
 {
@@ -14,10 +12,12 @@ namespace FoodWasteReduction.Api.Controllers
     [Authorize(Roles = "Student")]
     public class ReservationController(
         IPackageRepository packageRepository,
+        IStudentRepository studentRepository,
         UserManager<ApplicationUser> userManager
     ) : ControllerBase
     {
         private readonly IPackageRepository _packageRepository = packageRepository;
+        private readonly IStudentRepository _studentRepository = studentRepository;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
 
         [HttpPost]
@@ -44,8 +44,12 @@ namespace FoodWasteReduction.Api.Controllers
             if (user == null)
                 return NotFound("User not found");
 
+            var student = await _studentRepository.GetByIdAsync(dto.UserId);
+            if (student == null)
+                return NotFound("Student not found");
+
             // Check age for 18+ packages
-            if (user is Student student && package.Is18Plus)
+            if (package.Is18Plus)
             {
                 var ageAtPickup = package.PickupTime.Year - student.DateOfBirth.Year;
                 if (package.PickupTime.Date < student.DateOfBirth.Date.AddYears(ageAtPickup))

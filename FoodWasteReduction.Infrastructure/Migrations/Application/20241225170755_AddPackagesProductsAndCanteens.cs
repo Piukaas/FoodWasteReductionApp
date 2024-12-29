@@ -17,43 +17,49 @@ namespace FoodWasteReduction.Infrastructure.Migrations.Application
                 type: "int",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "nvarchar(max)");
+                oldType: "nvarchar(max)"
+            );
 
             migrationBuilder.CreateTable(
                 name: "Canteens",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    Id = table
+                        .Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     City = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Location = table.Column<int>(type: "int", nullable: false),
-                    ServesWarmMeals = table.Column<bool>(type: "bit", nullable: false)
+                    ServesWarmMeals = table.Column<bool>(type: "bit", nullable: false),
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Canteens", x => x.Id);
-                });
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "Products",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    Id = table
+                        .Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ContainsAlcohol = table.Column<bool>(type: "bit", nullable: false),
-                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Products", x => x.Id);
-                });
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "Packages",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    Id = table
+                        .Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     City = table.Column<int>(type: "int", nullable: false),
@@ -63,7 +69,7 @@ namespace FoodWasteReduction.Infrastructure.Migrations.Application
                     ExpiryTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Is18Plus = table.Column<bool>(type: "bit", nullable: false),
-                    ReservedById = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    ReservedById = table.Column<string>(type: "nvarchar(450)", nullable: true),
                 },
                 constraints: table =>
                 {
@@ -73,21 +79,24 @@ namespace FoodWasteReduction.Infrastructure.Migrations.Application
                         column: x => x.CanteenId,
                         principalTable: "Canteens",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Restrict
+                    );
                     table.ForeignKey(
                         name: "FK_Packages_Students_ReservedById",
                         column: x => x.ReservedById,
                         principalTable: "Students",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
-                });
+                        onDelete: ReferentialAction.SetNull
+                    );
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "PackageProduct",
                 columns: table => new
                 {
                     PackageId = table.Column<int>(type: "int", nullable: false),
-                    ProductsId = table.Column<int>(type: "int", nullable: false)
+                    ProductsId = table.Column<int>(type: "int", nullable: false),
                 },
                 constraints: table =>
                 {
@@ -97,45 +106,47 @@ namespace FoodWasteReduction.Infrastructure.Migrations.Application
                         column: x => x.PackageId,
                         principalTable: "Packages",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Cascade
+                    );
                     table.ForeignKey(
                         name: "FK_PackageProduct_Products_ProductsId",
                         column: x => x.ProductsId,
                         principalTable: "Products",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
+                        onDelete: ReferentialAction.Cascade
+                    );
+                }
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_PackageProduct_ProductsId",
                 table: "PackageProduct",
-                column: "ProductsId");
+                column: "ProductsId"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_Packages_CanteenId",
                 table: "Packages",
-                column: "CanteenId");
+                column: "CanteenId"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_Packages_ReservedById",
                 table: "Packages",
-                column: "ReservedById");
+                column: "ReservedById"
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "PackageProduct");
+            migrationBuilder.DropTable(name: "PackageProduct");
 
-            migrationBuilder.DropTable(
-                name: "Packages");
+            migrationBuilder.DropTable(name: "Packages");
 
-            migrationBuilder.DropTable(
-                name: "Products");
+            migrationBuilder.DropTable(name: "Products");
 
-            migrationBuilder.DropTable(
-                name: "Canteens");
+            migrationBuilder.DropTable(name: "Canteens");
 
             migrationBuilder.AlterColumn<string>(
                 name: "Location",
@@ -143,7 +154,8 @@ namespace FoodWasteReduction.Infrastructure.Migrations.Application
                 type: "nvarchar(max)",
                 nullable: false,
                 oldClrType: typeof(int),
-                oldType: "int");
+                oldType: "int"
+            );
         }
     }
 }
