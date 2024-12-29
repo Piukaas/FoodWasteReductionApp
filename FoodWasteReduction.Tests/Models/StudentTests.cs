@@ -1,8 +1,7 @@
 using FoodWasteReduction.Core.Entities;
 using FoodWasteReduction.Core.Enums;
-using Xunit;
 
-namespace FoodWasteReduction.Tests
+namespace FoodWasteReduction.Tests.Models
 {
     public class StudentTests
     {

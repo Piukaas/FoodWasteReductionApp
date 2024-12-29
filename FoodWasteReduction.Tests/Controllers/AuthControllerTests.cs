@@ -1,6 +1,9 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text.Json;
 using FluentAssertions;
 using FoodWasteReduction.Api.Controllers;
+using FoodWasteReduction.Api.Repositories.Interfaces;
 using FoodWasteReduction.Core.DTOs.Auth;
 using FoodWasteReduction.Core.Entities;
 using FoodWasteReduction.Core.Enums;
@@ -22,9 +25,10 @@ namespace FoodWasteReduction.Tests.Controllers
     {
         private readonly Mock<UserManager<ApplicationUser>> _mockUserManager;
         private readonly Mock<SignInManager<ApplicationUser>> _mockSignInManager;
-        private readonly ApplicationDbContext _context;
-        private readonly AuthController _controller;
+        private readonly Mock<IStudentRepository> _mockStudentRepository;
+        private readonly Mock<ICanteenStaffRepository> _mockCanteenStaffRepository;
         private readonly Mock<IConfiguration> _mockConfiguration;
+        private readonly AuthController _controller;
 
         public AuthControllerTests()
         {
@@ -66,12 +70,8 @@ namespace FoodWasteReduction.Tests.Controllers
                 confirmation.Object
             );
 
-            var dbContextOptions = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-                .ConfigureWarnings(w => w.Ignore(InMemoryEventId.TransactionIgnoredWarning))
-                .Options;
-
-            _context = new ApplicationDbContext(dbContextOptions);
+            _mockStudentRepository = new Mock<IStudentRepository>();
+            _mockCanteenStaffRepository = new Mock<ICanteenStaffRepository>();
 
             _mockConfiguration = new Mock<IConfiguration>();
             _mockConfiguration
@@ -84,7 +84,8 @@ namespace FoodWasteReduction.Tests.Controllers
             _controller = new AuthController(
                 _mockUserManager.Object,
                 _mockSignInManager.Object,
-                _context,
+                _mockStudentRepository.Object,
+                _mockCanteenStaffRepository.Object,
                 _mockConfiguration.Object
             );
         }
@@ -104,7 +105,7 @@ namespace FoodWasteReduction.Tests.Controllers
             };
 
             _mockUserManager
-                .Setup(x => x.CreateAsync(It.IsAny<Student>(), It.IsAny<string>()))
+                .Setup(x => x.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()))
                 .ReturnsAsync(
                     IdentityResult.Failed(
                         new IdentityError { Description = "Email already exists" }
@@ -118,6 +119,7 @@ namespace FoodWasteReduction.Tests.Controllers
             var badRequestResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
             var modelState = badRequestResult.Value as SerializableError;
             modelState.Should().ContainKey(string.Empty);
+            _mockStudentRepository.Verify(x => x.CreateAsync(It.IsAny<Student>()), Times.Never);
         }
 
         [Fact]
@@ -135,7 +137,7 @@ namespace FoodWasteReduction.Tests.Controllers
             };
 
             _mockUserManager
-                .Setup(x => x.CreateAsync(It.IsAny<Student>(), It.IsAny<string>()))
+                .Setup(x => x.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()))
                 .ReturnsAsync(
                     IdentityResult.Failed(
                         new IdentityError { Description = "Password must be at least 8 characters" }
@@ -149,6 +151,7 @@ namespace FoodWasteReduction.Tests.Controllers
             var badRequestResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
             var modelState = badRequestResult.Value as SerializableError;
             modelState.Should().ContainKey(string.Empty);
+            _mockStudentRepository.Verify(x => x.CreateAsync(It.IsAny<Student>()), Times.Never);
         }
 
         [Fact]
@@ -165,10 +168,6 @@ namespace FoodWasteReduction.Tests.Controllers
                 StudyCity = City.Breda,
             };
 
-            _mockUserManager
-                .Setup(x => x.CreateAsync(It.IsAny<Student>(), It.IsAny<string>()))
-                .ReturnsAsync(IdentityResult.Success);
-
             // Act
             var result = await _controller.RegisterStudent(registerDTO);
 
@@ -180,6 +179,11 @@ namespace FoodWasteReduction.Tests.Controllers
                 .As<string[]>()
                 .Should()
                 .Contain(x => x.Contains("16 jaar") && x.Contains("toekomst"));
+            _mockUserManager.Verify(
+                x => x.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()),
+                Times.Never
+            );
+            _mockStudentRepository.Verify(x => x.CreateAsync(It.IsAny<Student>()), Times.Never);
         }
 
         [Fact]
@@ -196,22 +200,22 @@ namespace FoodWasteReduction.Tests.Controllers
                 StudyCity = City.Breda,
             };
 
-            _mockUserManager
-                .Setup(x => x.CreateAsync(It.IsAny<Student>(), It.IsAny<string>()))
-                .ReturnsAsync(IdentityResult.Success);
-
             // Act
             var result = await _controller.RegisterStudent(registerDTO);
 
             // Assert
             var badRequestResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
             var modelState = badRequestResult.Value as SerializableError;
-            modelState.Should().ContainKey(string.Empty);
             modelState!
                 [string.Empty]
                 .As<string[]>()
                 .Should()
                 .Contain(x => x.Contains("16 jaar") && x.Contains("toekomst"));
+            _mockUserManager.Verify(
+                x => x.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()),
+                Times.Never
+            );
+            _mockStudentRepository.Verify(x => x.CreateAsync(It.IsAny<Student>()), Times.Never);
         }
 
         [Fact]
@@ -230,17 +234,21 @@ namespace FoodWasteReduction.Tests.Controllers
             };
 
             _mockUserManager
-                .Setup(x => x.CreateAsync(It.IsAny<Student>(), It.IsAny<string>()))
+                .Setup(x => x.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()))
                 .ReturnsAsync(IdentityResult.Success);
             _mockUserManager
                 .Setup(x => x.AddToRoleAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()))
                 .ReturnsAsync(IdentityResult.Success);
+            _mockStudentRepository
+                .Setup(x => x.CreateAsync(It.IsAny<Student>()))
+                .ReturnsAsync(new Student());
 
             // Act
             var result = await _controller.RegisterStudent(registerDTO);
 
             // Assert
             result.Should().BeOfType<OkResult>();
+            _mockStudentRepository.Verify(x => x.CreateAsync(It.IsAny<Student>()), Times.Once);
         }
 
         [Fact]
@@ -257,17 +265,33 @@ namespace FoodWasteReduction.Tests.Controllers
             };
 
             _mockUserManager
-                .Setup(x => x.CreateAsync(It.IsAny<CanteenStaff>(), It.IsAny<string>()))
+                .Setup(x => x.CreateAsync(It.IsAny<ApplicationUser>(), registerDTO.Password))
                 .ReturnsAsync(IdentityResult.Success);
+
             _mockUserManager
-                .Setup(x => x.AddToRoleAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()))
+                .Setup(x => x.AddToRoleAsync(It.IsAny<ApplicationUser>(), "CanteenStaff"))
                 .ReturnsAsync(IdentityResult.Success);
+
+            _mockCanteenStaffRepository
+                .Setup(x =>
+                    x.CreateAsync(
+                        It.Is<CanteenStaff>(cs =>
+                            cs.PersonnelNumber == registerDTO.PersonnelNumber
+                            && cs.Location == registerDTO.Location
+                        )
+                    )
+                )
+                .ReturnsAsync(new CanteenStaff());
 
             // Act
             var result = await _controller.RegisterCanteenStaff(registerDTO);
 
             // Assert
             result.Should().BeOfType<OkResult>();
+            _mockCanteenStaffRepository.Verify(
+                x => x.CreateAsync(It.IsAny<CanteenStaff>()),
+                Times.Once
+            );
         }
 
         [Fact]
@@ -276,35 +300,33 @@ namespace FoodWasteReduction.Tests.Controllers
             // Arrange
             var loginDTO = new LoginDTO { Email = "test@example.com", Password = "ValidPass123!" };
 
-            var user = new Student
+            var identityUser = new ApplicationUser
             {
-                Id = "123",
-                Email = "test@example.com",
+                Id = "testId",
+                Email = loginDTO.Email,
+                UserName = loginDTO.Email,
                 Name = "Test User",
-                StudentNumber = "S123456",
-                DateOfBirth = DateTime.Now.AddYears(-20),
-                StudyCity = City.Breda,
             };
 
-            // Setup in-memory database
-            _context.Students?.Add(user);
-            await _context.SaveChangesAsync();
+            var student = new Student
+            {
+                Id = "testId",
+                DateOfBirth = DateTime.Now.AddYears(-20),
+                StudyCity = City.Breda,
+                StudentNumber = "S123456",
+            };
 
             _mockSignInManager
-                .Setup(x =>
-                    x.PasswordSignInAsync(
-                        It.IsAny<string>(),
-                        It.IsAny<string>(),
-                        It.IsAny<bool>(),
-                        It.IsAny<bool>()
-                    )
-                )
+                .Setup(x => x.PasswordSignInAsync(loginDTO.Email, loginDTO.Password, false, false))
                 .ReturnsAsync(Microsoft.AspNetCore.Identity.SignInResult.Success);
 
-            _mockUserManager.Setup(x => x.FindByEmailAsync(It.IsAny<string>())).ReturnsAsync(user);
             _mockUserManager
-                .Setup(x => x.GetRolesAsync(It.IsAny<ApplicationUser>()))
-                .ReturnsAsync(["Student"]);
+                .Setup(x => x.FindByEmailAsync(loginDTO.Email))
+                .ReturnsAsync(identityUser);
+
+            _mockUserManager.Setup(x => x.GetRolesAsync(identityUser)).ReturnsAsync(["Student"]);
+
+            _mockStudentRepository.Setup(x => x.GetByIdAsync("testId")).ReturnsAsync(student);
 
             // Act
             var result = await _controller.Login(loginDTO);
@@ -320,10 +342,10 @@ namespace FoodWasteReduction.Tests.Controllers
             response.Should().ContainKey("responseData");
             var responseData = response!["responseData"];
 
-            responseData.TryGetProperty("Token", out var token);
+            responseData.TryGetProperty("Token", out JsonElement token);
             token.GetString().Should().NotBeNullOrEmpty();
 
-            responseData.TryGetProperty("Roles", out var rolesElement);
+            responseData.TryGetProperty("Roles", out JsonElement rolesElement);
             var roles = rolesElement.EnumerateArray().Select(r => r.GetString()).ToList();
             roles.Should().Contain("Student");
 
@@ -331,9 +353,37 @@ namespace FoodWasteReduction.Tests.Controllers
             if (response.ContainsKey("AdditionalData"))
             {
                 var additionalData = response["AdditionalData"];
-                additionalData.TryGetProperty("StudyCity", out var city);
+                additionalData.TryGetProperty("StudyCity", out JsonElement city);
                 city.GetInt32().Should().Be((int)City.Breda);
             }
+        }
+
+        [Fact]
+        public void GenerateJwtToken_ShouldCreateValidToken()
+        {
+            // Arrange
+            var user = new ApplicationUser
+            {
+                Id = "testId",
+                UserName = "test@example.com",
+                Email = "test@example.com",
+            };
+            var roles = new List<string> { "Student" };
+
+            // Act
+            var token = _controller.GenerateJwtToken(user, roles);
+
+            // Assert
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
+
+            jsonToken.Should().NotBeNull();
+            jsonToken!
+                .Claims.Should()
+                .Contain(c => c.Type == ClaimTypes.Role && c.Value == "Student");
+            jsonToken
+                .Claims.Should()
+                .Contain(c => c.Type == JwtRegisteredClaimNames.Sub && c.Value == "testId");
         }
     }
 }
