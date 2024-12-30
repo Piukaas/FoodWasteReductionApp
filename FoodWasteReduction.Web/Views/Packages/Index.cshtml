@@ -61,9 +61,13 @@
                 <div class="col-md-4 mb-4">
                     <div class="card shadow-sm">
                         <div class="card-body">
+                            @if (DateTime.Now > package.ExpiryTime)
+                            {
+                                <span class="position-absolute top-0 end-0 badge bg-warning mt-3 me-5">Verlopen</span>
+                            }
                             @if (package.Is18Plus)
                             {
-                                <span class="position-absolute top-0 end-0 badge bg-danger mt-3 me-3">18+</span>
+                                <span class="position-absolute top-0 end-0 badge bg-danger mt-3 me-1">18+</span>
                             }
                             <h5 class="card-title">@package.Name</h5>
                             <p class="card-text">
@@ -111,7 +115,7 @@
                             </div>
 
                             <div class="d-flex justify-content-end mt-3">
-                                @if (!package.Is18Plus || userAge >= 18)
+                                @if (!package.Is18Plus || userAge >= 18 || DateTime.Now > package.ExpiryTime)
                                 {
                                     <button class="btn btn-primary" onclick="reservePackage(@package.Id)"
                                         data-package-id="@package.Id">
@@ -155,9 +159,9 @@
             const alertDiv = document.createElement('div');
             alertDiv.className = 'alert alert-danger alert-dismissible fade show';
             alertDiv.innerHTML = `
-                    ${message}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                `;
+                            ${message}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        `;
             document.querySelector('.container').prepend(alertDiv);
         }
     </script>
