@@ -113,15 +113,20 @@
                                     </ul>
                                 </div>
                             </div>
-
                             <div class="d-flex justify-content-end mt-3">
-                                @if (!package.Is18Plus || userAge >= 18 || DateTime.Now > package.ExpiryTime)
-                                {
-                                    <button class="btn btn-primary" onclick="reservePackage(@package.Id)"
-                                        data-package-id="@package.Id">
-                                        Reserveer
-                                    </button>
-                                }
+                                <button
+                                    class="btn @(package.Is18Plus && userAge < 18 || DateTime.Now > package.ExpiryTime ? "btn-warning" : "btn-primary")"
+                                    onclick="reservePackage(@package.Id)" data-package-id="@package.Id">
+                                    Reserveer
+                                    @if (package.Is18Plus && userAge < 18)
+                                    {
+                                        <span class="badge bg-danger ms-1">18+</span>
+                                    }
+                                    @if (DateTime.Now > package.ExpiryTime)
+                                    {
+                                        <span class="badge bg-secondary ms-1">Verlopen</span>
+                                    }
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -159,9 +164,9 @@
             const alertDiv = document.createElement('div');
             alertDiv.className = 'alert alert-danger alert-dismissible fade show';
             alertDiv.innerHTML = `
-                            ${message}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        `;
+                                    ${message}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                `;
             document.querySelector('.container').prepend(alertDiv);
         }
     </script>
