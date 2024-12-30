@@ -73,6 +73,9 @@ namespace FoodWasteReduction.Api.Controllers
                 StudentNumber = model.StudentNumber,
                 DateOfBirth = model.DateOfBirth,
                 StudyCity = model.StudyCity,
+                Email = model.Email,
+                Name = model.Name,
+                PhoneNumber = model.PhoneNumber,
             };
 
             await _studentRepository.CreateAsync(student);
