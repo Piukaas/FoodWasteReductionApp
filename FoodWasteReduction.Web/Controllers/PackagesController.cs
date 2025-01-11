@@ -70,13 +70,10 @@ namespace FoodWasteReduction.Web.Controllers
             if (!string.IsNullOrEmpty(userData))
             {
                 var jsonObject = JsonNode.Parse(userData);
-                var location = jsonObject?["Location"]?.GetValue<int>();
-                if (location.HasValue)
+                var staffCanteenId = jsonObject?["CanteenId"]?.GetValue<int>();
+                if (staffCanteenId.HasValue)
                 {
-                    var staffCanteen = canteens.FirstOrDefault(c =>
-                        (int)c.Location == location.Value
-                    );
-
+                    var staffCanteen = canteens.FirstOrDefault(c => c.Id == staffCanteenId.Value);
                     ViewData["StaffCanteen"] = staffCanteen?.Id;
 
                     if (!Request.Query.ContainsKey("canteenId"))

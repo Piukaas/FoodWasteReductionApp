@@ -74,7 +74,7 @@ namespace FoodWasteReduction.Tests.Controllers.Web
             {
                 new() { Id = 1, Location = location },
             };
-            SetupUserSession("staff1", "CanteenStaff", location);
+            SetupUserSession("staff1", "CanteenStaff", 1);
             _canteenService.Setup(s => s.GetCanteens()).ReturnsAsync(canteens);
 
             // Act

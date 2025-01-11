@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using FoodWasteReduction.Core.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FoodWasteReduction.Core.Entities
 {
@@ -12,6 +12,9 @@ namespace FoodWasteReduction.Core.Entities
         public string PersonnelNumber { get; set; } = string.Empty;
 
         [Required]
-        public Location Location { get; set; }
+        [ForeignKey("Canteen")]
+        public int CanteenId { get; set; }
+
+        public virtual Canteen? Canteen { get; set; }
     }
 }

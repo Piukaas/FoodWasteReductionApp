@@ -4,6 +4,7 @@ using FoodWasteReduction.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FoodWasteReduction.Infrastructure.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250111122448_AddCanteedIdToStaff")]
+    partial class AddCanteedIdToStaff
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,7 +52,7 @@ namespace FoodWasteReduction.Infrastructure.Migrations.Application
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("CanteenId")
+                    b.Property<int?>("CanteenId")
                         .HasColumnType("int");
 
                     b.Property<string>("PersonnelNumber")
@@ -183,8 +186,7 @@ namespace FoodWasteReduction.Infrastructure.Migrations.Application
                     b.HasOne("FoodWasteReduction.Core.Entities.Canteen", "Canteen")
                         .WithMany()
                         .HasForeignKey("CanteenId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Canteen");
                 });

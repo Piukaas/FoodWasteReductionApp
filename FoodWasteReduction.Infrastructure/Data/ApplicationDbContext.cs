@@ -24,6 +24,11 @@ namespace FoodWasteReduction.Infrastructure.Data
             builder.Entity<CanteenStaff>(entity =>
             {
                 entity.ToTable("CanteenStaff");
+                entity
+                    .HasOne(cs => cs.Canteen)
+                    .WithMany()
+                    .HasForeignKey(cs => cs.CanteenId)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
 
             builder.Entity<Package>(entity =>
