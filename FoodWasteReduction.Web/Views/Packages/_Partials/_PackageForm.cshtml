@@ -9,11 +9,11 @@
     if (!string.IsNullOrEmpty(userData))
     {
         var jsonObject = JsonNode.Parse(userData);
-        userLocation = jsonObject?["Location"]?.GetValue<int>() ?? 0;
+        userLocation = jsonObject?["CanteenId"]?.GetValue<int>() ?? 0;
     }
 
     var userCanteen = (ViewData["Canteens"] as IEnumerable<Canteen>)?.FirstOrDefault(c =>
-    (int)c.Location == userLocation);
+    (int)c.Id == userLocation);
 
     if (userCanteen != null)
     {

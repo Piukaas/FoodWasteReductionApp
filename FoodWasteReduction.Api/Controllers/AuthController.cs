@@ -109,7 +109,7 @@ namespace FoodWasteReduction.Api.Controllers
             {
                 Id = identityUser.Id,
                 PersonnelNumber = model.PersonnelNumber,
-                Location = model.Location,
+                CanteenId = model.CanteenId,
             };
 
             await _canteenStaffRepository.CreateAsync(canteenStaff);
@@ -166,7 +166,7 @@ namespace FoodWasteReduction.Api.Controllers
                     var staff = await _canteenStaffRepository.GetByIdAsync(user.Id);
                     if (staff != null)
                     {
-                        additionalData.Add("Location", staff.Location);
+                        additionalData.Add("CanteenId", staff.CanteenId);
                     }
                 }
 
