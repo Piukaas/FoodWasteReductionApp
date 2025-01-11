@@ -1,7 +1,6 @@
 using FluentAssertions;
 using FoodWasteReduction.Api.Repositories;
 using FoodWasteReduction.Core.Entities;
-using FoodWasteReduction.Core.Enums;
 
 namespace FoodWasteReduction.Tests.Repositories
 {
@@ -21,7 +20,7 @@ namespace FoodWasteReduction.Tests.Repositories
             {
                 Id = "test-id",
                 PersonnelNumber = "P123456",
-                Location = Location.LA,
+                CanteenId = 1,
             };
 
             return await _repository.CreateAsync(staff);
@@ -39,7 +38,7 @@ namespace FoodWasteReduction.Tests.Repositories
             // Assert
             result.Should().NotBeNull();
             result!.Id.Should().Be(staff.Id);
-            result.Location.Should().Be(staff.Location);
+            result.CanteenId.Should().Be(staff.CanteenId);
             result.PersonnelNumber.Should().Be(staff.PersonnelNumber);
         }
 
@@ -61,7 +60,7 @@ namespace FoodWasteReduction.Tests.Repositories
             {
                 Id = "new-id",
                 PersonnelNumber = "P654321",
-                Location = Location.LD,
+                CanteenId = 1,
             };
 
             // Act

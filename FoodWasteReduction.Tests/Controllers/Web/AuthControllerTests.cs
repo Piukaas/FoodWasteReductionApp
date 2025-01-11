@@ -9,6 +9,7 @@ namespace FoodWasteReduction.Tests.Controllers.Web
 {
     public class AuthControllerTests : ControllerTestBase
     {
+        private readonly Mock<ICanteenService> _canteenService;
         private readonly Mock<IAuthService> _authService;
         private readonly Mock<IAuthGuardService> _authGuardService;
         private readonly AuthController _controller;
@@ -17,7 +18,12 @@ namespace FoodWasteReduction.Tests.Controllers.Web
         {
             _authService = new Mock<IAuthService>();
             _authGuardService = new Mock<IAuthGuardService>();
-            _controller = new AuthController(_authService.Object, _authGuardService.Object)
+            _canteenService = new Mock<ICanteenService>();
+            _controller = new AuthController(
+                _authService.Object,
+                _authGuardService.Object,
+                _canteenService.Object
+            )
             {
                 ControllerContext = new ControllerContext { HttpContext = HttpContext },
             };

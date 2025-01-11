@@ -213,7 +213,7 @@ namespace FoodWasteReduction.Tests.Controllers.Api
                 Password = "ValidPass123!",
                 Name = "Staff User",
                 PersonnelNumber = "P123456",
-                Location = Location.LA,
+                CanteenId = 1,
             };
 
             UserManager
@@ -229,7 +229,7 @@ namespace FoodWasteReduction.Tests.Controllers.Api
                     x.CreateAsync(
                         It.Is<CanteenStaff>(cs =>
                             cs.PersonnelNumber == registerDTO.PersonnelNumber
-                            && cs.Location == registerDTO.Location
+                            && cs.CanteenId == registerDTO.CanteenId
                         )
                     )
                 )

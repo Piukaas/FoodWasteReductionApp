@@ -140,7 +140,7 @@ namespace FoodWasteReduction.Tests.Services
                 PersonnelNumber = "P123456",
                 Password = "Password123!",
                 ConfirmPassword = "Password123!",
-                Location = Core.Enums.Location.LA,
+                CanteenId = 1,
             };
             SetupHttpResponse(HttpStatusCode.OK);
 
@@ -173,7 +173,7 @@ namespace FoodWasteReduction.Tests.Services
             {
                 Email = "staff@test.com",
                 PersonnelNumber = "P123456",
-                Location = Core.Enums.Location.LA,
+                CanteenId = 1,
             };
 
             HttpRequestMessage? capturedRequest = null;

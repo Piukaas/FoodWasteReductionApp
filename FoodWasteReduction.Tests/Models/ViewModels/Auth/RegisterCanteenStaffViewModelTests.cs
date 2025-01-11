@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using FluentAssertions;
-using FoodWasteReduction.Core.Enums;
 using FoodWasteReduction.Web.Models.Auth;
 
 namespace FoodWasteReduction.Tests.Models.ViewModels.Auth
@@ -14,7 +13,7 @@ namespace FoodWasteReduction.Tests.Models.ViewModels.Auth
                 Email = "staff@example.com",
                 Name = "John Doe",
                 PersonnelNumber = "P123456",
-                Location = Location.LA,
+                CanteenId = 1,
                 Password = "Password123!",
                 ConfirmPassword = "Password123!",
             };
