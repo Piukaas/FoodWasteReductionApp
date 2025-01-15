@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.Identity;
 using FoodWasteReduction.Core.Constants;
+using Microsoft.AspNetCore.Identity;
 
 namespace FoodWasteReduction.Infrastructure.Identity
 {

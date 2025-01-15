@@ -1,6 +1,6 @@
 using FoodWasteReduction.Core.Entities;
 
-namespace FoodWasteReduction.Api.Repositories.Interfaces
+namespace FoodWasteReduction.Core.Interfaces.Repositories
 {
     public interface ICanteenRepository
     {

@@ -1,9 +1,9 @@
-using FoodWasteReduction.Api.Repositories.Interfaces;
 using FoodWasteReduction.Core.Entities;
+using FoodWasteReduction.Core.Interfaces.Repositories;
 using FoodWasteReduction.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace FoodWasteReduction.Api.Repositories
+namespace FoodWasteReduction.Infrastructure.Repositories
 {
     public class PackageRepository(ApplicationDbContext context) : IPackageRepository
     {

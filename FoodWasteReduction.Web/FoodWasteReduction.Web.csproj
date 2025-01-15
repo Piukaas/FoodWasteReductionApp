@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FoodWasteReduction.Application\FoodWasteReduction.Application.csproj" />
+    <ProjectReference Include="..\FoodWasteReduction.Core\FoodWasteReduction.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
