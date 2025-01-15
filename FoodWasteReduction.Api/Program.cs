@@ -1,6 +1,6 @@
 using FoodWasteReduction.Api.DependencyInjection;
-using FoodWasteReduction.Infrastructure.Identity;
-using Microsoft.AspNetCore.Identity;
+using FoodWasteReduction.Application;
+using FoodWasteReduction.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,19 +13,14 @@ builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
 
 builder
-    .Services.AddDatabaseServices(builder.Configuration)
-    .AddAuthenticationServices(builder.Configuration)
+    .Services.AddApplicationLayer()
+    .AddInfrastructureLayer(builder.Configuration)
     .AddSwaggerServices()
-    .AddRepositoryServices()
     .AddGraphQLServices();
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    await RoleSeeder.SeedRoles(roleManager);
-}
+await app.InitializeInfrastructureAsync();
 
 if (app.Environment.IsDevelopment())
 {
@@ -40,8 +35,7 @@ app.UseSwaggerUI(c =>
 });
 
 app.UseRouting();
-app.UseAuthentication();
-app.UseAuthorization();
+app.UseInfrastructureLayer();
 
 app.MapGraphQL();
 app.MapControllers();

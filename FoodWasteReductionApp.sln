@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoodWasteReduction.Api", "F
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoodWasteReduction.Tests", "FoodWasteReduction.Tests\FoodWasteReduction.Tests.csproj", "{CE22223B-5D6C-468E-B65C-F010067EFB6B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoodWasteReduction.Application", "FoodWasteReduction.Application\FoodWasteReduction.Application.csproj", "{452420BE-66AD-40DA-887C-7A9F20C1E1C8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -58,5 +60,9 @@ Global
 		{CE22223B-5D6C-468E-B65C-F010067EFB6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CE22223B-5D6C-468E-B65C-F010067EFB6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CE22223B-5D6C-468E-B65C-F010067EFB6B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{452420BE-66AD-40DA-887C-7A9F20C1E1C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{452420BE-66AD-40DA-887C-7A9F20C1E1C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{452420BE-66AD-40DA-887C-7A9F20C1E1C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{452420BE-66AD-40DA-887C-7A9F20C1E1C8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

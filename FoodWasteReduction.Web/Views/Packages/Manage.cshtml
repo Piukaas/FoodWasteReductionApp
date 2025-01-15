@@ -1,5 +1,6 @@
+@using FoodWasteReduction.Application.DTOs.Json
 @using FoodWasteReduction.Core.Entities
-@model IEnumerable<FoodWasteReduction.Core.Entities.Package>
+@model IEnumerable<JsonPackageDTO>
 @{
     ViewData["Title"] = "Beheer pakketten";
 }
@@ -18,8 +19,8 @@
             <form method="get" class="d-flex gap-2 align-items-center">
                 <select name="canteenId" class="form-select" style="width: auto;">
                     <option value="">Alle kantines</option>
-                    @foreach (var canteen in ViewData["Canteens"] as IEnumerable<Canteen> ??
-                    Enumerable.Empty<Canteen>())
+                    @foreach (var canteen in ViewData["Canteens"] as IEnumerable<JsonCanteenDTO> ??
+                    Enumerable.Empty<JsonCanteenDTO>())
                     {
                         <option value="@canteen.Id"
                             selected="@(ViewData["SelectedCanteenId"]?.ToString() == canteen.Id.ToString())">

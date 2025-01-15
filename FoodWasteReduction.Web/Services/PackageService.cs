@@ -1,24 +1,24 @@
 using System.Net.Http.Headers;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using FoodWasteReduction.Core.Entities;
+using FoodWasteReduction.Application.DTOs.Json;
 using FoodWasteReduction.Core.Enums;
 using FoodWasteReduction.Web.Models;
+using FoodWasteReduction.Web.Services.GraphQL;
+using FoodWasteReduction.Web.Services.GraphQL.Models;
 using FoodWasteReduction.Web.Services.Interfaces;
 
 namespace FoodWasteReduction.Web.Services
 {
     public class PackageService(
         IHttpClientFactory httpClientFactory,
-        IAuthGuardService authGuardservice
-    ) : IPackageService
+        IAuthGuardService authGuardService
+    ) : GraphQLServiceBase(httpClientFactory, authGuardService), IPackageService
     {
         private readonly HttpClient _httpClient = httpClientFactory.CreateClient("API");
-        private readonly IAuthGuardService _authGuardservice = authGuardservice;
+        private readonly IAuthGuardService _authGuardService = authGuardService;
 
-        public async Task<Package> CreatePackage(PackageViewModel model)
+        public async Task<JsonPackageDTO> CreatePackage(PackageViewModel model)
         {
-            var token = _authGuardservice.GetToken();
+            var token = _authGuardService.GetToken();
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
                 "Bearer",
                 token
@@ -28,13 +28,13 @@ namespace FoodWasteReduction.Web.Services
             if (!response.IsSuccessStatusCode)
                 throw new Exception("Failed to create package");
 
-            return await response.Content.ReadFromJsonAsync<Package>()
+            return await response.Content.ReadFromJsonAsync<JsonPackageDTO>()
                 ?? throw new Exception("Invalid response");
         }
 
-        public async Task<Product> CreateProduct(ProductViewModel model)
+        public async Task<JsonProductDTO> CreateProduct(ProductViewModel model)
         {
-            var token = _authGuardservice.GetToken();
+            var token = _authGuardService.GetToken();
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
                 "Bearer",
                 token
@@ -44,13 +44,13 @@ namespace FoodWasteReduction.Web.Services
             if (!response.IsSuccessStatusCode)
                 throw new Exception("Failed to create product");
 
-            return await response.Content.ReadFromJsonAsync<Product>()
+            return await response.Content.ReadFromJsonAsync<JsonProductDTO>()
                 ?? throw new Exception("Invalid response");
         }
 
-        public async Task<Package> UpdatePackage(int id, PackageViewModel model)
+        public async Task<JsonPackageDTO> UpdatePackage(int id, PackageViewModel model)
         {
-            var token = _authGuardservice.GetToken();
+            var token = _authGuardService.GetToken();
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
                 "Bearer",
                 token
@@ -60,13 +60,13 @@ namespace FoodWasteReduction.Web.Services
             if (!response.IsSuccessStatusCode)
                 throw new Exception("Failed to update package");
 
-            return await response.Content.ReadFromJsonAsync<Package>()
+            return await response.Content.ReadFromJsonAsync<JsonPackageDTO>()
                 ?? throw new Exception("Invalid response");
         }
 
         public async Task DeletePackage(int id)
         {
-            var token = _authGuardservice.GetToken();
+            var token = _authGuardService.GetToken();
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
                 "Bearer",
                 token
@@ -77,7 +77,7 @@ namespace FoodWasteReduction.Web.Services
                 throw new Exception("Failed to delete package");
         }
 
-        public async Task<Package?> GetPackage(int id)
+        public async Task<JsonPackageDTO?> GetPackage(int id)
         {
             var query =
                 @"
@@ -105,30 +105,15 @@ namespace FoodWasteReduction.Web.Services
                     }
                 }";
 
-            var variables = new { id };
-            var options = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-                Converters = { new JsonStringEnumConverter() },
-            };
-
-            var token = _authGuardservice.GetToken();
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
-                "Bearer",
-                token
+            var response = await ExecuteGraphQLRequest<GraphQLResponse<PackagesData>>(
+                query,
+                new { id }
             );
 
-            var response = await _httpClient.PostAsJsonAsync("graphql", new { query, variables });
-            var content = await response.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<GraphQLResponse<PackagesData>>(
-                content,
-                options
-            );
-
-            return result?.Data?.Packages?.FirstOrDefault();
+            return response?.Data?.Packages?.FirstOrDefault();
         }
 
-        public async Task<IEnumerable<Package>> GetAvailablePackages(
+        public async Task<IEnumerable<JsonPackageDTO>> GetAvailablePackages(
             City? city = null,
             MealType? type = null
         )
@@ -167,32 +152,16 @@ namespace FoodWasteReduction.Web.Services
                         }
                     }";
 
-            var options = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-                Converters = { new JsonStringEnumConverter() },
-            };
+            var variables = new { city = city?.ToString(), type = type?.ToString() };
 
-            var token = _authGuardservice.GetToken();
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
-                "Bearer",
-                token
+            var response = await ExecuteGraphQLRequest<GraphQLResponse<PackagesData>>(
+                query,
+                variables
             );
-
-            var response = await _httpClient.PostAsJsonAsync("graphql", new { query });
-            var content = await response.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<GraphQLResponse<PackagesData>>(
-                content,
-                options
-            );
-
-            if (result?.Data?.Packages == null)
-                return [];
-
-            return result.Data.Packages;
+            return response?.Data?.Packages ?? [];
         }
 
-        public async Task<IEnumerable<Package>> GetReservedPackages(string? userId = null)
+        public async Task<IEnumerable<JsonPackageDTO>> GetReservedPackages(string? userId = null)
         {
             var query =
                 @"
@@ -218,30 +187,16 @@ namespace FoodWasteReduction.Web.Services
                 }";
 
             var variables = new { userId };
-            var options = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-                Converters = { new JsonStringEnumConverter() },
-            };
-
-            var token = _authGuardservice.GetToken();
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
-                "Bearer",
-                token
+            var response = await ExecuteGraphQLRequest<GraphQLResponse<PackagesData>>(
+                query,
+                variables
             );
-
-            var response = await _httpClient.PostAsJsonAsync("graphql", new { query, variables });
-            var content = await response.Content.ReadAsStringAsync();
-
-            var result = JsonSerializer.Deserialize<GraphQLResponse<PackagesData>>(
-                content,
-                options
-            );
-            var packages = result?.Data?.Packages ?? [];
-            return packages;
+            return response?.Data?.Packages ?? [];
         }
 
-        public async Task<IEnumerable<Package>> GetPackagesForManagement(int? canteenId = null)
+        public async Task<IEnumerable<JsonPackageDTO>> GetPackagesForManagement(
+            int? canteenId = null
+        )
         {
             var query =
                 $@"
@@ -275,30 +230,15 @@ namespace FoodWasteReduction.Web.Services
                     }}
                 }}";
 
-            var options = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-                Converters = { new JsonStringEnumConverter() },
-            };
-
-            var token = _authGuardservice.GetToken();
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
-                "Bearer",
-                token
+            var variables = new { canteenId };
+            var response = await ExecuteGraphQLRequest<GraphQLResponse<PackagesData>>(
+                query,
+                variables
             );
-
-            var response = await _httpClient.PostAsJsonAsync("graphql", new { query });
-            var content = await response.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<GraphQLResponse<PackagesData>>(
-                content,
-                options
-            );
-            var packages = result?.Data?.Packages ?? [];
-
-            return packages.OrderBy(p => p.PickupTime);
+            return (response?.Data?.Packages ?? []).OrderBy(p => p.PickupTime);
         }
 
-        public async Task<IEnumerable<Product>> GetProducts()
+        public async Task<IEnumerable<JsonProductDTO>> GetProducts()
         {
             var query =
                 @"
@@ -311,41 +251,8 @@ namespace FoodWasteReduction.Web.Services
                     }
                 }";
 
-            var options = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-                Converters = { new JsonStringEnumConverter() },
-            };
-
-            var token = _authGuardservice.GetToken();
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
-                "Bearer",
-                token
-            );
-
-            var response = await _httpClient.PostAsJsonAsync("graphql", new { query });
-            var content = await response.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<GraphQLResponse<ProductsData>>(
-                content,
-                options
-            );
-
-            return result?.Data?.Products ?? [];
+            var response = await ExecuteGraphQLRequest<GraphQLResponse<ProductsData>>(query);
+            return response?.Data?.Products ?? [];
         }
-    }
-
-    public class GraphQLResponse<T>
-    {
-        public T? Data { get; set; }
-    }
-
-    public class PackagesData
-    {
-        public IEnumerable<Package>? Packages { get; set; }
-    }
-
-    public class ProductsData
-    {
-        public IEnumerable<Product>? Products { get; set; }
     }
 }

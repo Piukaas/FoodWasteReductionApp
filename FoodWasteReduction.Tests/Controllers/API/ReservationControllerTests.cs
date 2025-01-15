@@ -1,10 +1,8 @@
 using FluentAssertions;
 using FoodWasteReduction.Api.Controllers;
-using FoodWasteReduction.Api.Repositories.Interfaces;
-using FoodWasteReduction.Core.DTOs;
+using FoodWasteReduction.Application.DTOs;
+using FoodWasteReduction.Application.Services.Interfaces;
 using FoodWasteReduction.Core.Entities;
-using FoodWasteReduction.Tests.Controllers.Api;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 
@@ -12,20 +10,13 @@ namespace FoodWasteReduction.Tests.Controllers.Api
 {
     public class ReservationControllerTests : ApiControllerTestBase
     {
-        private readonly Mock<IPackageRepository> _packageRepository;
-        private readonly Mock<IStudentRepository> _studentRepository;
+        private readonly Mock<IReservationService> _mockReservationService;
         private readonly ReservationController _controller;
 
         public ReservationControllerTests()
         {
-            _packageRepository = new Mock<IPackageRepository>();
-            _studentRepository = new Mock<IStudentRepository>();
-
-            _controller = new ReservationController(
-                _packageRepository.Object,
-                _studentRepository.Object,
-                UserManager.Object
-            );
+            _mockReservationService = new Mock<IReservationService>();
+            _controller = new ReservationController(_mockReservationService.Object);
             SetupController(_controller);
         }
 
@@ -44,14 +35,36 @@ namespace FoodWasteReduction.Tests.Controllers.Api
         }
 
         [Fact]
-        public async Task ReservePackage_WithNonExistentPackage_ReturnsNotFound()
+        public async Task ReservePackage_WithSuccess_ReturnsOkWithPackage()
         {
             // Arrange
             SetupUserRole("Student", _controller);
             var dto = new ReservePackageDTO { PackageId = 1, UserId = "user1" };
-            _packageRepository
-                .Setup(r => r.GetPackageWithDetailsAsync(1))
-                .ReturnsAsync((Package?)null);
+            var packageDto = new PackageDTO(new Package { Id = 1, ReservedById = "user1" });
+
+            _mockReservationService
+                .Setup(s => s.ReservePackageAsync(dto))
+                .ReturnsAsync((true, packageDto, null));
+
+            // Act
+            var result = await _controller.ReservePackage(dto);
+
+            // Assert
+            var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
+            okResult.Value.Should().Be(packageDto);
+        }
+
+        [Fact]
+        public async Task ReservePackage_WithNotFoundError_ReturnsNotFound()
+        {
+            // Arrange
+            SetupUserRole("Student", _controller);
+            var dto = new ReservePackageDTO { PackageId = 1, UserId = "user1" };
+            var error = new ErrorResponse { Code = "NOT_FOUND", Message = "Package not found" };
+
+            _mockReservationService
+                .Setup(s => s.ReservePackageAsync(dto))
+                .ReturnsAsync((false, null, error));
 
             // Act
             var result = await _controller.ReservePackage(dto);
@@ -62,105 +75,27 @@ namespace FoodWasteReduction.Tests.Controllers.Api
         }
 
         [Fact]
-        public async Task ReservePackage_WithAlreadyReservedPackage_ReturnsBadRequest()
+        public async Task ReservePackage_WithOtherError_ReturnsBadRequest()
         {
             // Arrange
             SetupUserRole("Student", _controller);
             var dto = new ReservePackageDTO { PackageId = 1, UserId = "user1" };
-            var package = new Package { Id = 1, ReservedById = "otherUser" };
-            _packageRepository.Setup(r => r.GetPackageWithDetailsAsync(1)).ReturnsAsync(package);
-
-            // Act
-            var result = await _controller.ReservePackage(dto);
-
-            // Assert
-            var badRequest = result.Should().BeOfType<BadRequestObjectResult>().Subject;
-            var error = badRequest.Value.Should().BeOfType<ErrorResponse>().Subject;
-            error.Code.Should().Be("ALREADY_RESERVED");
-        }
-
-        [Fact]
-        public async Task ReservePackage_WithUnderage_ReturnsBadRequest()
-        {
-            // Arrange
-            SetupUserRole("Student", _controller);
-            var dto = new ReservePackageDTO { PackageId = 1, UserId = "user1" };
-            var package = new Package
+            var error = new ErrorResponse
             {
-                Id = 1,
-                Is18Plus = true,
-                PickupTime = DateTime.Now.AddDays(1),
+                Code = "ALREADY_RESERVED",
+                Message = "Package already reserved",
             };
-            var student = new Student { Id = "user1", DateOfBirth = DateTime.Now.AddYears(-17) };
-            var user = new ApplicationUser { Id = "user1" };
 
-            _packageRepository.Setup(r => r.GetPackageWithDetailsAsync(1)).ReturnsAsync(package);
-            _studentRepository.Setup(r => r.GetByIdAsync("user1")).ReturnsAsync(student);
-            UserManager.Setup(u => u.FindByIdAsync("user1")).ReturnsAsync(user);
+            _mockReservationService
+                .Setup(s => s.ReservePackageAsync(dto))
+                .ReturnsAsync((false, null, error));
 
             // Act
             var result = await _controller.ReservePackage(dto);
 
             // Assert
             var badRequest = result.Should().BeOfType<BadRequestObjectResult>().Subject;
-            var error = badRequest.Value.Should().BeOfType<ErrorResponse>().Subject;
-            error.Code.Should().Be("AGE_RESTRICTION");
-        }
-
-        [Fact]
-        public async Task ReservePackage_WithDuplicateReservation_ReturnsBadRequest()
-        {
-            // Arrange
-            SetupUserRole("Student", _controller);
-            var dto = new ReservePackageDTO { PackageId = 1, UserId = "user1" };
-            var package = new Package { Id = 1, PickupTime = DateTime.Now.AddDays(1) };
-            var student = new Student { Id = "user1", DateOfBirth = DateTime.Now.AddYears(-20) };
-            var user = new ApplicationUser { Id = "user1" };
-
-            _packageRepository.Setup(r => r.GetPackageWithDetailsAsync(1)).ReturnsAsync(package);
-            _packageRepository
-                .Setup(r => r.HasReservationOnDateAsync("user1", package.PickupTime))
-                .ReturnsAsync(true);
-            _studentRepository.Setup(r => r.GetByIdAsync("user1")).ReturnsAsync(student);
-            UserManager.Setup(u => u.FindByIdAsync("user1")).ReturnsAsync(user);
-
-            // Act
-            var result = await _controller.ReservePackage(dto);
-
-            // Assert
-            var badRequest = result.Should().BeOfType<BadRequestObjectResult>().Subject;
-            var error = badRequest.Value.Should().BeOfType<ErrorResponse>().Subject;
-            error.Code.Should().Be("DUPLICATE_RESERVATION");
-        }
-
-        [Fact]
-        public async Task ReservePackage_WithValidRequest_ReturnsOkWithReservedPackage()
-        {
-            // Arrange
-            SetupUserRole("Student", _controller);
-            var dto = new ReservePackageDTO { PackageId = 1, UserId = "user1" };
-            var package = new Package { Id = 1, PickupTime = DateTime.Now.AddDays(1) };
-            var reservedPackage = new Package { Id = 1, ReservedById = "user1" };
-            var student = new Student { Id = "user1", DateOfBirth = DateTime.Now.AddYears(-20) };
-            var user = new ApplicationUser { Id = "user1" };
-
-            _packageRepository.Setup(r => r.GetPackageWithDetailsAsync(1)).ReturnsAsync(package);
-            _packageRepository
-                .Setup(r => r.HasReservationOnDateAsync("user1", package.PickupTime))
-                .ReturnsAsync(false);
-            _packageRepository
-                .Setup(r => r.ReservePackageAsync(package, "user1"))
-                .ReturnsAsync(reservedPackage);
-            _studentRepository.Setup(r => r.GetByIdAsync("user1")).ReturnsAsync(student);
-            UserManager.Setup(u => u.FindByIdAsync("user1")).ReturnsAsync(user);
-
-            // Act
-            var result = await _controller.ReservePackage(dto);
-
-            // Assert
-            var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
-            var returnedPackage = okResult.Value.Should().BeOfType<Package>().Subject;
-            returnedPackage.ReservedById.Should().Be("user1");
+            badRequest.Value.Should().Be(error);
         }
     }
 }

@@ -1,4 +1,5 @@
 using FluentAssertions;
+using FoodWasteReduction.Application.DTOs.Json;
 using FoodWasteReduction.Core.Entities;
 using FoodWasteReduction.Core.Enums;
 using FoodWasteReduction.Web.Controllers;
@@ -30,7 +31,7 @@ namespace FoodWasteReduction.Tests.Controllers.Web
         {
             // Arrange
             var city = City.Breda;
-            var packages = new List<Package>
+            var packages = new List<JsonPackageDTO>
             {
                 new() { Id = 1, City = city },
             };
@@ -51,7 +52,7 @@ namespace FoodWasteReduction.Tests.Controllers.Web
             // Arrange
             var userId = "user1";
             SetupUserSession(userId, "Student");
-            var packages = new List<Package>
+            var packages = new List<JsonPackageDTO>
             {
                 new() { Id = 1, ReservedById = userId },
             };
@@ -70,7 +71,7 @@ namespace FoodWasteReduction.Tests.Controllers.Web
         {
             // Arrange
             var location = Location.LA;
-            var canteens = new List<Canteen>
+            var canteens = new List<JsonCanteenDTO>
             {
                 new() { Id = 1, Location = location },
             };
@@ -108,7 +109,13 @@ namespace FoodWasteReduction.Tests.Controllers.Web
         public async Task Edit_WithValidId_ReturnsPackageForEditing()
         {
             // Arrange
-            var package = new Package { Id = 1, Name = "Test Package" };
+            var package = new JsonPackageDTO
+            {
+                Id = 1,
+                Name = "Test Package",
+                Price = 5.95m,
+                Type = MealType.Warm,
+            };
             _packageService.Setup(s => s.GetPackage(1)).ReturnsAsync(package);
 
             // Act
@@ -140,7 +147,7 @@ namespace FoodWasteReduction.Tests.Controllers.Web
         {
             // Arrange
             var model = new ProductViewModel { Name = "Test Product" };
-            var product = new Product { Id = 1, Name = "Test Product" };
+            var product = new JsonProductDTO { Id = 1, Name = "Test Product" };
             _packageService.Setup(s => s.CreateProduct(model)).ReturnsAsync(product);
 
             // Act

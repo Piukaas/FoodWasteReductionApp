@@ -1,6 +1,5 @@
-using FoodWasteReduction.Api.Repositories.Interfaces;
-using FoodWasteReduction.Core.DTOs;
-using FoodWasteReduction.Core.Entities;
+using FoodWasteReduction.Application.DTOs;
+using FoodWasteReduction.Application.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,29 +8,23 @@ namespace FoodWasteReduction.Api.Controllers
     [Authorize(Roles = "CanteenStaff")]
     [ApiController]
     [Route("api/[controller]")]
-    public class ProductsController(IProductRepository productRepository) : ControllerBase
+    public class ProductsController(IProductService productService) : ControllerBase
     {
-        private readonly IProductRepository _productRepository = productRepository;
+        private readonly IProductService _productService = productService;
 
         [HttpPost]
-        public async Task<ActionResult<Product>> CreateProduct(CreateProductDTO dto)
+        public async Task<ActionResult<ProductDTO>> CreateProduct(CreateProductDTO dto)
         {
             if (!User.IsInRole("CanteenStaff"))
-            {
                 return Forbid();
-            }
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var product = new Product
-            {
-                Name = dto.Name,
-                ContainsAlcohol = dto.ContainsAlcohol,
-                ImageUrl = dto.ImageUrl,
-            };
+            var (success, product, error) = await _productService.CreateAsync(dto);
+            if (!success)
+                return BadRequest(error);
 
-            product = await _productRepository.CreateProductAsync(product);
             return Ok(product);
         }
     }

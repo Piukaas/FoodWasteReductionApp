@@ -1,7 +1,7 @@
 using FluentAssertions;
 using FoodWasteReduction.Api.Controllers;
-using FoodWasteReduction.Api.Repositories.Interfaces;
-using FoodWasteReduction.Core.DTOs;
+using FoodWasteReduction.Application.DTOs;
+using FoodWasteReduction.Application.Services.Interfaces;
 using FoodWasteReduction.Core.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -10,13 +10,13 @@ namespace FoodWasteReduction.Tests.Controllers.Api
 {
     public class ProductsControllerTests : ApiControllerTestBase
     {
-        private readonly Mock<IProductRepository> _mockRepository;
+        private readonly Mock<IProductService> _mockService;
         private readonly ProductsController _controller;
 
         public ProductsControllerTests()
         {
-            _mockRepository = new Mock<IProductRepository>();
-            _controller = new ProductsController(_mockRepository.Object);
+            _mockService = new Mock<IProductService>();
+            _controller = new ProductsController(_mockService.Object);
             SetupController(_controller);
         }
 
@@ -24,7 +24,7 @@ namespace FoodWasteReduction.Tests.Controllers.Api
         public async Task CreateProduct_WithoutAuthorization_ReturnsForbidden()
         {
             // Arrange
-            var dto = new CreateProductDTO { Name = "Test Product" };
+            var dto = new CreateProductDTO();
 
             // Act
             var result = await _controller.CreateProduct(dto);
@@ -53,32 +53,35 @@ namespace FoodWasteReduction.Tests.Controllers.Api
         {
             // Arrange
             SetupUserRole("CanteenStaff", _controller);
-            var dto = new CreateProductDTO
-            {
-                Name = "Test Product",
-                ContainsAlcohol = true,
-                ImageUrl = "test.jpg",
-            };
+            var dto = new CreateProductDTO { Name = "Test Product" };
+            var productDto = new ProductDTO(new Product { Id = 1, Name = dto.Name });
 
-            var createdProduct = new Product
-            {
-                Id = 1,
-                Name = dto.Name,
-                ContainsAlcohol = dto.ContainsAlcohol,
-                ImageUrl = dto.ImageUrl,
-            };
-
-            _mockRepository
-                .Setup(r => r.CreateProductAsync(It.IsAny<Product>()))
-                .ReturnsAsync(createdProduct);
+            _mockService.Setup(s => s.CreateAsync(dto)).ReturnsAsync((true, productDto, null));
 
             // Act
             var result = await _controller.CreateProduct(dto);
 
             // Assert
             var okResult = result.Result.Should().BeOfType<OkObjectResult>().Subject;
-            var returnedProduct = okResult.Value.Should().BeOfType<Product>().Subject;
-            returnedProduct.Should().BeEquivalentTo(createdProduct);
+            okResult.Value.Should().Be(productDto);
+        }
+
+        [Fact]
+        public async Task CreateProduct_WithServiceError_ReturnsBadRequest()
+        {
+            // Arrange
+            SetupUserRole("CanteenStaff", _controller);
+            var dto = new CreateProductDTO();
+            _mockService
+                .Setup(s => s.CreateAsync(dto))
+                .ReturnsAsync((false, null, "Error message"));
+
+            // Act
+            var result = await _controller.CreateProduct(dto);
+
+            // Assert
+            var badRequest = result.Result.Should().BeOfType<BadRequestObjectResult>().Subject;
+            badRequest.Value.Should().Be("Error message");
         }
     }
 }

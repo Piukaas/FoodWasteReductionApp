@@ -1,6 +1,6 @@
 using FluentAssertions;
-using FoodWasteReduction.Api.Repositories;
 using FoodWasteReduction.Core.Entities;
+using FoodWasteReduction.Infrastructure.Repositories;
 
 namespace FoodWasteReduction.Tests.Repositories
 {

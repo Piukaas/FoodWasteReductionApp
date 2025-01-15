@@ -1,5 +1,5 @@
 using System.Net.Http.Headers;
-using FoodWasteReduction.Core.DTOs;
+using FoodWasteReduction.Application.DTOs;
 using FoodWasteReduction.Web.Services.Interfaces;
 
 namespace FoodWasteReduction.Web.Services
