@@ -1,6 +1,7 @@
+@using FoodWasteReduction.Application.DTOs.Json
 @using FoodWasteReduction.Core.Entities
 @using FoodWasteReduction.Core.Enums
-@model IEnumerable<FoodWasteReduction.Core.Entities.Package>
+@model IEnumerable<JsonPackageDTO>
 @{
     ViewData["Title"] = "Pakketten";
     Layout = "_Layout";
@@ -93,7 +94,7 @@
                                 <div class="card card-body bg-light">
                                     <h6 class="bold">Producten:</h6>
                                     <ul class="list-unstyled">
-                                        @foreach (var product in package.Products ?? Enumerable.Empty<Product>())
+                                        @foreach (var product in package.Products ?? Enumerable.Empty<JsonProductDTO>())
                                         {
                                             <li class="d-flex align-items-center mb-2">
                                                 @if (!string.IsNullOrEmpty(product.ImageUrl))
@@ -164,9 +165,9 @@
             const alertDiv = document.createElement('div');
             alertDiv.className = 'alert alert-danger alert-dismissible fade show';
             alertDiv.innerHTML = `
-                                    ${message}
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                `;
+                                                        ${message}
+                                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                                    `;
             document.querySelector('.container').prepend(alertDiv);
         }
     </script>

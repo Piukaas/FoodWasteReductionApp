@@ -1,6 +1,8 @@
 using System.Net;
 using FluentAssertions;
+using FoodWasteReduction.Application.DTOs;
 using FoodWasteReduction.Core.Entities;
+using FoodWasteReduction.Core.Enums;
 using FoodWasteReduction.Web.Services;
 
 namespace FoodWasteReduction.Tests.Services.Web
@@ -18,10 +20,10 @@ namespace FoodWasteReduction.Tests.Services.Web
         public async Task GetCanteens_WhenSuccessful_ReturnsCanteens()
         {
             // Arrange
-            var canteens = new[]
+            var canteens = new List<CanteenDTO>
             {
-                new Canteen { Id = 1, Location = Core.Enums.Location.LA },
-                new Canteen { Id = 2, Location = Core.Enums.Location.LD },
+                new(new Canteen { Id = 1, Location = Location.LA }),
+                new(new Canteen { Id = 2, Location = Location.LD }),
             };
             SetupHttpResponse(HttpStatusCode.OK, canteens);
 

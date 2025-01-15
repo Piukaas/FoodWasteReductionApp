@@ -1,9 +1,9 @@
-using FoodWasteReduction.Core.Entities;
+using FoodWasteReduction.Application.DTOs.Json;
 
 namespace FoodWasteReduction.Web.Services.Interfaces
 {
     public interface ICanteenService
     {
-        Task<IEnumerable<Canteen>> GetCanteens();
+        Task<IEnumerable<JsonCanteenDTO>> GetCanteens();
     }
 }

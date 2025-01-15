@@ -1,5 +1,6 @@
+@using FoodWasteReduction.Application.DTOs.Json
 @using FoodWasteReduction.Core.Entities
-@model IEnumerable<FoodWasteReduction.Core.Entities.Package>
+@model IEnumerable<JsonPackageDTO>
 @{
     ViewData["Title"] = "Mijn Reserveringen";
 }
@@ -41,7 +42,7 @@
                             <div class="mt-3">
                                 <h6 class="bold">Producten:</h6>
                                 <ul class="list-unstyled">
-                                    @foreach (var product in package.Products ?? Enumerable.Empty<Product>())
+                                    @foreach (var product in package.Products ?? Enumerable.Empty<JsonProductDTO>())
                                     {
                                         <li>
                                             @product.Name

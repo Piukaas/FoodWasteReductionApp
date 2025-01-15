@@ -1,8 +1,11 @@
 using System.Net;
 using FluentAssertions;
+using FoodWasteReduction.Application.DTOs.Json;
 using FoodWasteReduction.Core.Entities;
+using FoodWasteReduction.Core.Enums;
 using FoodWasteReduction.Web.Models;
 using FoodWasteReduction.Web.Services;
+using FoodWasteReduction.Web.Services.GraphQL.Models;
 using Moq;
 using Moq.Protected;
 
@@ -42,7 +45,16 @@ namespace FoodWasteReduction.Tests.Services.Web
             {
                 Data = new PackagesData
                 {
-                    Packages = [new Package { Id = packageId, Name = "Test" }],
+                    Packages =
+                    [
+                        new JsonPackageDTO
+                        {
+                            Id = packageId,
+                            Name = "Test",
+                            Type = MealType.Warm,
+                            City = City.Breda,
+                        },
+                    ],
                 },
             };
             SetupHttpResponse(HttpStatusCode.OK, graphQLResponse);
@@ -95,10 +107,21 @@ namespace FoodWasteReduction.Tests.Services.Web
         {
             // Arrange
             var userId = "user123";
-            var packages = new[]
+            var packages = new List<JsonPackageDTO>
             {
-                new Package { Id = 1, Name = "Reserved Package" },
+                new()
+                {
+                    Id = 1,
+                    Name = "Reserved Package",
+                    ReservedBy = new JsonStudentDTO
+                    {
+                        Id = userId,
+                        Name = "Test User",
+                        Email = "test@test.com",
+                    },
+                },
             };
+
             var graphQLResponse = new GraphQLResponse<PackagesData>
             {
                 Data = new PackagesData { Packages = packages },
