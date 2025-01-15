@@ -3,13 +3,11 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using FoodWasteReduction.Api.Repositories.Interfaces;
+using FoodWasteReduction.Application.DTOs.Auth;
 using FoodWasteReduction.Core.Constants;
-using FoodWasteReduction.Core.DTOs.Auth;
 using FoodWasteReduction.Core.Entities;
-using FoodWasteReduction.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace FoodWasteReduction.Api.Controllers

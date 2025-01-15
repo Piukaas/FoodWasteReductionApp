@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace FoodWasteReduction.Core.DTOs
+namespace FoodWasteReduction.Application.DTOs
 {
     public class CreateProductDTO
     {

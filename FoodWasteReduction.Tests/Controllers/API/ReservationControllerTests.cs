@@ -1,10 +1,8 @@
 using FluentAssertions;
 using FoodWasteReduction.Api.Controllers;
 using FoodWasteReduction.Api.Repositories.Interfaces;
-using FoodWasteReduction.Core.DTOs;
+using FoodWasteReduction.Application.DTOs;
 using FoodWasteReduction.Core.Entities;
-using FoodWasteReduction.Tests.Controllers.Api;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 

@@ -1,5 +1,5 @@
 using FoodWasteReduction.Api.Repositories.Interfaces;
-using FoodWasteReduction.Core.DTOs;
+using FoodWasteReduction.Application.DTOs;
 using FoodWasteReduction.Core.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

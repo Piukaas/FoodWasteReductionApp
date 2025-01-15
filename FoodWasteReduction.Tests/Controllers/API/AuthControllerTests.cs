@@ -2,7 +2,7 @@ using System.Text.Json;
 using FluentAssertions;
 using FoodWasteReduction.Api.Controllers;
 using FoodWasteReduction.Api.Repositories.Interfaces;
-using FoodWasteReduction.Core.DTOs.Auth;
+using FoodWasteReduction.Application.DTOs.Auth;
 using FoodWasteReduction.Core.Entities;
 using FoodWasteReduction.Core.Enums;
 using Microsoft.AspNetCore.Identity;

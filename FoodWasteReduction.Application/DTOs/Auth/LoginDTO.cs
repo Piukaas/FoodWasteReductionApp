@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace FoodWasteReduction.Core.DTOs.Auth
+namespace FoodWasteReduction.Application.DTOs.Auth
 {
     public class LoginDTO
     {

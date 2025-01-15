@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using FluentAssertions;
-using FoodWasteReduction.Core.DTOs;
+using FoodWasteReduction.Application.DTOs;
 
 namespace FoodWasteReduction.Tests.Models.DTOs
 {

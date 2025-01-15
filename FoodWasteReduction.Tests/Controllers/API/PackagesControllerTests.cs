@@ -1,7 +1,7 @@
 using FluentAssertions;
 using FoodWasteReduction.Api.Controllers;
 using FoodWasteReduction.Api.Repositories.Interfaces;
-using FoodWasteReduction.Core.DTOs;
+using FoodWasteReduction.Application.DTOs;
 using FoodWasteReduction.Core.Entities;
 using FoodWasteReduction.Core.Enums;
 using Microsoft.AspNetCore.Mvc;

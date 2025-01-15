@@ -1,4 +1,4 @@
-namespace FoodWasteReduction.Core.DTOs
+namespace FoodWasteReduction.Application.DTOs
 {
     public class ErrorResponse
     {

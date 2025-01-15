@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using FoodWasteReduction.Core.Enums;
 using FoodWasteReduction.Core.Validations;
 
-namespace FoodWasteReduction.Core.DTOs
+namespace FoodWasteReduction.Application.DTOs
 {
     public class CreatePackageDTO
     {

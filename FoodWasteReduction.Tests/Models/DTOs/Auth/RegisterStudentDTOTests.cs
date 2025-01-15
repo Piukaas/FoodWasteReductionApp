@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using FluentAssertions;
-using FoodWasteReduction.Core.DTOs.Auth;
+using FoodWasteReduction.Application.DTOs.Auth;
 using FoodWasteReduction.Core.Enums;
 
 namespace FoodWasteReduction.Tests.Models.DTOs.Auth

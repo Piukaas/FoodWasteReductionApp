@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using FoodWasteReduction.Core.Enums;
 
-namespace FoodWasteReduction.Core.DTOs
+namespace FoodWasteReduction.Application.DTOs
 {
     public class CreateCanteenDTO
     {

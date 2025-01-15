@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using FoodWasteReduction.Core.Enums;
 
-namespace FoodWasteReduction.Core.DTOs.Auth
+namespace FoodWasteReduction.Application.DTOs.Auth
 {
     public class RegisterCanteenStaffDTO
     {
