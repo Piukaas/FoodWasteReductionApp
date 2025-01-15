@@ -1,4 +1,4 @@
-@using FoodWasteReduction.Core.Entities
+@using FoodWasteReduction.Application.DTOs.Json
 @using FoodWasteReduction.Core.Enums
 @model RegisterCanteenStaffViewModel
 
@@ -30,11 +30,12 @@
                 <span asp-validation-for="PersonnelNumber" class="text-danger"></span>
             </div>
 
+            using FoodWasteReduction.Application.DTOs.Json;
             <div class="form-group mb-3">
                 <label asp-for="CanteenId" class="control-label">Kantine</label>
                 <select asp-for="CanteenId" class="form-select">
                     <option value="">Selecteer een kantine</option>
-                    @foreach (var canteen in (IEnumerable<Canteen>)ViewData["Canteens"]!)
+                    @foreach (var canteen in (IEnumerable<JsonCanteenDTO>)ViewData["Canteens"]!)
                     {
                         <option value="@canteen.Id">@canteen.City - @canteen.Location</option>
                     }
