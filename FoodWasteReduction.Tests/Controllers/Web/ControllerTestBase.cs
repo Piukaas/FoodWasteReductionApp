@@ -23,7 +23,7 @@ namespace FoodWasteReduction.Tests.Controllers.Web
         protected void SetupUserSession(
             string userId,
             string role,
-            Location? location = null,
+            int canteenId = 1,
             City? studyCity = null,
             DateTime? dateOfBirth = null
         )
@@ -32,7 +32,7 @@ namespace FoodWasteReduction.Tests.Controllers.Web
             {
                 Id = userId,
                 Role = role,
-                Location = location.HasValue ? (int?)location.Value : null,
+                CanteenId = canteenId,
                 StudyCity = studyCity.HasValue ? (int?)studyCity.Value : null,
                 DateOfBirth = dateOfBirth?.ToString("O"),
             };

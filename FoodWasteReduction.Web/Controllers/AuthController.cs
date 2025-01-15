@@ -5,11 +5,15 @@ using Newtonsoft.Json;
 
 namespace FoodWasteReduction.Web.Controllers
 {
-    public class AuthController(IAuthService authService, IAuthGuardService authGuardService)
-        : Controller
+    public class AuthController(
+        IAuthService authService,
+        IAuthGuardService authGuardService,
+        ICanteenService canteenService
+    ) : Controller
     {
         private readonly IAuthService _authService = authService;
         private readonly IAuthGuardService _authGuardService = authGuardService;
+        private readonly ICanteenService _canteenService = canteenService;
 
         [HttpGet]
         public IActionResult Login()
@@ -69,8 +73,9 @@ namespace FoodWasteReduction.Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult RegisterCanteenStaff()
+        public async Task<IActionResult> RegisterCanteenStaff()
         {
+            ViewData["Canteens"] = await _canteenService.GetCanteens();
             return View();
         }
 

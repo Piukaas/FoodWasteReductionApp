@@ -43,8 +43,8 @@ namespace FoodWasteReduction.Web.Services
                 StudyCity = additionalData.TryGetProperty("StudyCity", out var city)
                     ? (City?)city.GetInt32()
                     : null,
-                Location = additionalData.TryGetProperty("Location", out var location)
-                    ? (Location?)location.GetInt32()
+                CanteenId = additionalData.TryGetProperty("CanteenId", out var canteenId)
+                    ? (int?)canteenId.GetInt32()
                     : null,
                 DateOfBirth = additionalData.TryGetProperty("DateOfBirth", out var dob)
                     ? (DateTime?)dob.GetDateTime()

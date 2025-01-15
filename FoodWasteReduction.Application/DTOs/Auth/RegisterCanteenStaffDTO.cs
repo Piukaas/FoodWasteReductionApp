@@ -16,7 +16,7 @@ namespace FoodWasteReduction.Application.DTOs.Auth
         public string PersonnelNumber { get; set; } = string.Empty;
 
         [Required]
-        public Location Location { get; set; }
+        public int CanteenId { get; set; }
 
         [Required]
         [MinLength(8)]

@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using FluentAssertions;
 using FoodWasteReduction.Application.DTOs.Auth;
-using FoodWasteReduction.Core.Enums;
 
 namespace FoodWasteReduction.Tests.Models.DTOs.Auth
 {
@@ -14,7 +13,7 @@ namespace FoodWasteReduction.Tests.Models.DTOs.Auth
                 Email = "staff@example.com",
                 Name = "Jane Doe",
                 PersonnelNumber = "P123456",
-                Location = Location.LA,
+                CanteenId = 1,
                 Password = "Password123!",
             };
         }

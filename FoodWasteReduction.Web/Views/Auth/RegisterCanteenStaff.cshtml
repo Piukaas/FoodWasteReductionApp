@@ -1,3 +1,4 @@
+@using FoodWasteReduction.Core.Entities
 @using FoodWasteReduction.Core.Enums
 @model RegisterCanteenStaffViewModel
 
@@ -30,14 +31,15 @@
             </div>
 
             <div class="form-group mb-3">
-                <label asp-for="Location" class="control-label"></label>
-                <select asp-for="Location" class="form-select">
-                    @foreach (var location in Enum.GetValues<Location>())
+                <label asp-for="CanteenId" class="control-label">Kantine</label>
+                <select asp-for="CanteenId" class="form-select">
+                    <option value="">Selecteer een kantine</option>
+                    @foreach (var canteen in (IEnumerable<Canteen>)ViewData["Canteens"]!)
                     {
-                        <option value="@location">@location</option>
+                        <option value="@canteen.Id">@canteen.City - @canteen.Location</option>
                     }
                 </select>
-                <span asp-validation-for="Location" class="text-danger"></span>
+                <span asp-validation-for="CanteenId" class="text-danger"></span>
             </div>
 
             <div class="form-group mb-3">

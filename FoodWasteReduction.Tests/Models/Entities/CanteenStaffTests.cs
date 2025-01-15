@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using FluentAssertions;
 using FoodWasteReduction.Core.Entities;
-using FoodWasteReduction.Core.Enums;
 
 namespace FoodWasteReduction.Tests.Models.Entities
 {
@@ -13,7 +12,7 @@ namespace FoodWasteReduction.Tests.Models.Entities
             {
                 Id = "test-id",
                 PersonnelNumber = "P123456",
-                Location = Location.LA,
+                CanteenId = 1,
             };
         }
 
@@ -64,28 +63,7 @@ namespace FoodWasteReduction.Tests.Models.Entities
             // Assert
             staff.Id.Should().BeEmpty();
             staff.PersonnelNumber.Should().BeEmpty();
-            staff.Location.Should().Be(default);
-        }
-
-        [Theory]
-        [InlineData(Location.LA)]
-        [InlineData(Location.LD)]
-        [InlineData(Location.HS)]
-        [InlineData(Location.TA)]
-        public void CanteenStaff_WithValidLocation_PassesValidation(Location location)
-        {
-            // Arrange
-            var staff = CreateValidStaff();
-            staff.Location = location;
-
-            // Act
-            var context = new ValidationContext(staff);
-            var results = new List<ValidationResult>();
-            var isValid = Validator.TryValidateObject(staff, context, results, true);
-
-            // Assert
-            isValid.Should().BeTrue();
-            results.Should().BeEmpty();
+            staff.CanteenId.Should().Be(0);
         }
     }
 }
