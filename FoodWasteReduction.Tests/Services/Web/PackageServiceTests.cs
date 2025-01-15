@@ -3,11 +3,10 @@ using FluentAssertions;
 using FoodWasteReduction.Core.Entities;
 using FoodWasteReduction.Web.Models;
 using FoodWasteReduction.Web.Services;
-using FoodWasteReduction.Web.Services.Interfaces;
 using Moq;
 using Moq.Protected;
 
-namespace FoodWasteReduction.Tests.Services
+namespace FoodWasteReduction.Tests.Services.Web
 {
     public class PackageServiceTests : ServiceTestBase
     {

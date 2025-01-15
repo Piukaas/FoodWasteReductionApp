@@ -1,10 +1,8 @@
 using System.Net;
 using FluentAssertions;
 using FoodWasteReduction.Web.Services;
-using FoodWasteReduction.Web.Services.Interfaces;
-using Moq;
 
-namespace FoodWasteReduction.Tests.Services
+namespace FoodWasteReduction.Tests.Services.Web
 {
     public class ReservationServiceTests : ServiceTestBase
     {

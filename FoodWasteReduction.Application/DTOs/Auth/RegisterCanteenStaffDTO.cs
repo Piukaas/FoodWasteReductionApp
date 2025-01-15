@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using FoodWasteReduction.Core.Enums;
 
 namespace FoodWasteReduction.Application.DTOs.Auth
 {

@@ -1,6 +1,5 @@
 using FoodWasteReduction.Application.DTOs;
-using FoodWasteReduction.Core.Entities;
-using FoodWasteReduction.Core.Interfaces.Repositories;
+using FoodWasteReduction.Application.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,32 +7,28 @@ namespace FoodWasteReduction.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class CanteensController(ICanteenRepository canteenRepository) : ControllerBase
+    public class CanteensController(ICanteenService canteenService) : ControllerBase
     {
-        private readonly ICanteenRepository _canteenRepository = canteenRepository;
+        private readonly ICanteenService _canteenService = canteenService;
 
         [Authorize(Roles = "CanteenStaff")]
         [HttpPost]
-        public async Task<ActionResult<Canteen>> Create(CreateCanteenDTO dto)
+        public async Task<ActionResult<CanteenDTO>> Create(CreateCanteenDTO dto)
         {
             if (!User.IsInRole("CanteenStaff"))
                 return Forbid();
 
-            var canteen = new Canteen
-            {
-                City = dto.City,
-                Location = dto.Location,
-                ServesWarmMeals = dto.ServesWarmMeals,
-            };
+            var (success, canteen, error) = await _canteenService.CreateAsync(dto);
+            if (!success)
+                return BadRequest(error);
 
-            canteen = await _canteenRepository.CreateAsync(canteen);
             return Ok(canteen);
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Canteen>>> GetAll()
+        public async Task<ActionResult<IEnumerable<CanteenDTO>>> GetAll()
         {
-            var canteens = await _canteenRepository.GetAllAsync();
+            var canteens = await _canteenService.GetAllAsync();
             return Ok(canteens);
         }
     }

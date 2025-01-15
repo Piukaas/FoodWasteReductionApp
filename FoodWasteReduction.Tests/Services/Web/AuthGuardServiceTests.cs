@@ -5,7 +5,7 @@ using FoodWasteReduction.Web.Services;
 using Microsoft.AspNetCore.Http;
 using Moq;
 
-namespace FoodWasteReduction.Tests.Services
+namespace FoodWasteReduction.Tests.Services.Web
 {
     public class AuthGuardServiceTests
     {

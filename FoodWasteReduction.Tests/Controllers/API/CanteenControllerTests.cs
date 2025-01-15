@@ -1,10 +1,9 @@
 using FluentAssertions;
 using FoodWasteReduction.Api.Controllers;
 using FoodWasteReduction.Application.DTOs;
+using FoodWasteReduction.Application.Services.Interfaces;
 using FoodWasteReduction.Core.Entities;
 using FoodWasteReduction.Core.Enums;
-using FoodWasteReduction.Core.Interfaces.Repositories;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 
@@ -12,26 +11,20 @@ namespace FoodWasteReduction.Tests.Controllers.Api
 {
     public class CanteenControllerTests : ApiControllerTestBase
     {
-        private readonly Mock<ICanteenRepository> _mockRepository;
+        private readonly Mock<ICanteenService> _mockCanteenService;
         private readonly CanteensController _controller;
 
         public CanteenControllerTests()
         {
-            _mockRepository = new Mock<ICanteenRepository>();
-            _controller = new CanteensController(_mockRepository.Object);
+            _mockCanteenService = new Mock<ICanteenService>();
+            _controller = new CanteensController(_mockCanteenService.Object);
             SetupController(_controller);
         }
 
         [Fact]
-        public async Task Create_WithValidInput_ReturnsCreatedCanteen()
+        public async Task Create_WithAuthorizedUser_ReturnsOkResult()
         {
             // Arrange
-            SetupUserRole("CanteenStaff", _controller);
-            _controller.ControllerContext = new ControllerContext
-            {
-                HttpContext = new DefaultHttpContext { User = User },
-            };
-
             var dto = new CreateCanteenDTO
             {
                 City = City.Breda,
@@ -39,31 +32,32 @@ namespace FoodWasteReduction.Tests.Controllers.Api
                 ServesWarmMeals = true,
             };
 
-            var createdCanteen = new Canteen
+            var canteen = new Canteen
             {
                 Id = 1,
-                City = dto.City,
-                Location = dto.Location,
-                ServesWarmMeals = dto.ServesWarmMeals,
+                City = City.Breda,
+                Location = Location.LA,
+                ServesWarmMeals = true,
             };
 
-            _mockRepository
-                .Setup(r => r.CreateAsync(It.IsAny<Canteen>()))
-                .ReturnsAsync(createdCanteen);
+            var expectedCanteen = new CanteenDTO(canteen);
+
+            SetupUserRole("CanteenStaff", _controller);
+            _mockCanteenService
+                .Setup(x => x.CreateAsync(dto))
+                .ReturnsAsync((true, expectedCanteen, null));
 
             // Act
             var result = await _controller.Create(dto);
 
             // Assert
             var okResult = result.Result.Should().BeOfType<OkObjectResult>().Subject;
-            var returnedCanteen = okResult.Value.Should().BeOfType<Canteen>().Subject;
-            returnedCanteen.City.Should().Be(dto.City);
-            returnedCanteen.Location.Should().Be(dto.Location);
-            returnedCanteen.ServesWarmMeals.Should().Be(dto.ServesWarmMeals);
+            okResult.Value.Should().BeEquivalentTo(expectedCanteen);
+            _mockCanteenService.Verify(x => x.CreateAsync(dto), Times.Once);
         }
 
         [Fact]
-        public async Task Create_WithoutAuthorization_ReturnsUnauthorized()
+        public async Task Create_WithUnauthorizedUser_ReturnsForbidResult()
         {
             // Arrange
             var dto = new CreateCanteenDTO();
@@ -73,10 +67,14 @@ namespace FoodWasteReduction.Tests.Controllers.Api
 
             // Assert
             result.Result.Should().BeOfType<ForbidResult>();
+            _mockCanteenService.Verify(
+                x => x.CreateAsync(It.IsAny<CreateCanteenDTO>()),
+                Times.Never
+            );
         }
 
         [Fact]
-        public async Task GetAll_ReturnsAllCanteens()
+        public async Task GetAll_ReturnsOkResultWithCanteens()
         {
             // Arrange
             var canteens = new List<Canteen>
@@ -95,37 +93,19 @@ namespace FoodWasteReduction.Tests.Controllers.Api
                 },
             };
 
-            _mockRepository.Setup(r => r.GetAllAsync()).ReturnsAsync(canteens);
+            var expectedCanteens = canteens.Select(c => new CanteenDTO(c)).ToList();
+            _mockCanteenService.Setup(x => x.GetAllAsync()).ReturnsAsync(expectedCanteens);
 
             // Act
             var result = await _controller.GetAll();
 
             // Assert
             var okResult = result.Result.Should().BeOfType<OkObjectResult>().Subject;
-            var returnedCanteens = okResult
+            var canteensResult = okResult
                 .Value.Should()
-                .BeAssignableTo<IEnumerable<Canteen>>()
+                .BeAssignableTo<IEnumerable<CanteenDTO>>()
                 .Subject;
-            returnedCanteens.Should().HaveCount(2);
-            returnedCanteens.Should().BeEquivalentTo(canteens);
-        }
-
-        [Fact]
-        public async Task GetAll_WhenEmpty_ReturnsEmptyList()
-        {
-            // Arrange
-            _mockRepository.Setup(r => r.GetAllAsync()).ReturnsAsync(new List<Canteen>());
-
-            // Act
-            var result = await _controller.GetAll();
-
-            // Assert
-            var okResult = result.Result.Should().BeOfType<OkObjectResult>().Subject;
-            var returnedCanteens = okResult
-                .Value.Should()
-                .BeAssignableTo<IEnumerable<Canteen>>()
-                .Subject;
-            returnedCanteens.Should().BeEmpty();
+            canteensResult.Should().BeEquivalentTo(expectedCanteens);
         }
     }
 }

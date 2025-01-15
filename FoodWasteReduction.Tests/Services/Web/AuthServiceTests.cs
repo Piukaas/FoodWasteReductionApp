@@ -1,12 +1,11 @@
 using System.Net;
-using System.Text.Json;
 using FluentAssertions;
 using FoodWasteReduction.Web.Models.Auth;
 using FoodWasteReduction.Web.Services;
 using Moq;
 using Moq.Protected;
 
-namespace FoodWasteReduction.Tests.Services
+namespace FoodWasteReduction.Tests.Services.Web
 {
     public class AuthServiceTests : ServiceTestBase
     {

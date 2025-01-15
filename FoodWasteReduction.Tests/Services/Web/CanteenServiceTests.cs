@@ -3,7 +3,7 @@ using FluentAssertions;
 using FoodWasteReduction.Core.Entities;
 using FoodWasteReduction.Web.Services;
 
-namespace FoodWasteReduction.Tests.Services
+namespace FoodWasteReduction.Tests.Services.Web
 {
     public class CanteenServiceTests : ServiceTestBase
     {

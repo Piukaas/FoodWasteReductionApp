@@ -1,4 +1,5 @@
 using FoodWasteReduction.Api.DependencyInjection;
+using FoodWasteReduction.Application;
 using FoodWasteReduction.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,7 +13,8 @@ builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
 
 builder
-    .Services.AddInfrastructureLayer(builder.Configuration)
+    .Services.AddApplicationLayer()
+    .AddInfrastructureLayer(builder.Configuration)
     .AddSwaggerServices()
     .AddGraphQLServices();
 

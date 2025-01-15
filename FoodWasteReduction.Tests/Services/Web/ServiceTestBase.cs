@@ -4,7 +4,7 @@ using FoodWasteReduction.Web.Services.Interfaces;
 using Moq;
 using Moq.Protected;
 
-namespace FoodWasteReduction.Tests.Services
+namespace FoodWasteReduction.Tests.Services.Web
 {
     public abstract class ServiceTestBase
     {

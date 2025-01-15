@@ -1,313 +1,146 @@
-using System.Text.Json;
 using FluentAssertions;
 using FoodWasteReduction.Api.Controllers;
 using FoodWasteReduction.Application.DTOs.Auth;
-using FoodWasteReduction.Core.Entities;
-using FoodWasteReduction.Core.Enums;
-using FoodWasteReduction.Core.Interfaces.Repositories;
-using Microsoft.AspNetCore.Identity;
+using FoodWasteReduction.Application.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Moq;
 
 namespace FoodWasteReduction.Tests.Controllers.Api
 {
     public class AuthControllerTests : ApiControllerTestBase
     {
-        private readonly Mock<IStudentRepository> _mockStudentRepository;
-        private readonly Mock<ICanteenStaffRepository> _mockCanteenStaffRepository;
-        private readonly Mock<IConfiguration> _mockConfiguration;
+        private readonly Mock<IAuthService> _mockAuthService;
         private readonly AuthController _controller;
 
         public AuthControllerTests()
             : base()
         {
-            _mockStudentRepository = new Mock<IStudentRepository>();
-            _mockCanteenStaffRepository = new Mock<ICanteenStaffRepository>();
-
-            _mockConfiguration = new Mock<IConfiguration>();
-            _mockConfiguration
-                .SetupGet(x => x["Jwt:Key"])
-                .Returns("MegaSuperSecretKey1234567890123456");
-            _mockConfiguration.SetupGet(x => x["Jwt:Issuer"]).Returns("FoodWasteReductionApp");
-            _mockConfiguration.SetupGet(x => x["Jwt:Audience"]).Returns("http://localhost:5019");
-            _mockConfiguration.SetupGet(x => x["Jwt:ExpireMinutes"]).Returns("30");
-
-            _controller = new AuthController(
-                UserManager.Object,
-                SignInManager.Object,
-                _mockStudentRepository.Object,
-                _mockCanteenStaffRepository.Object,
-                _mockConfiguration.Object
-            );
-        }
-
-        [Fact]
-        public async Task RegisterStudent_WithDuplicateEmail_ReturnsBadRequest()
-        {
-            // Arrange
-            var registerDTO = new RegisterStudentDTO
-            {
-                Email = "existing@example.com",
-                Password = "ValidPass123!",
-                Name = "Test User",
-                StudentNumber = "S123456",
-                DateOfBirth = new DateTime(2000, 1, 1),
-                StudyCity = City.Breda,
-            };
-
-            UserManager
-                .Setup(x => x.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()))
-                .ReturnsAsync(
-                    IdentityResult.Failed(
-                        new IdentityError { Description = "Email already exists" }
-                    )
-                );
-
-            // Act
-            var result = await _controller.RegisterStudent(registerDTO);
-
-            // Assert
-            var badRequestResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
-            var modelState = badRequestResult.Value as SerializableError;
-            modelState.Should().ContainKey(string.Empty);
-            _mockStudentRepository.Verify(x => x.CreateAsync(It.IsAny<Student>()), Times.Never);
-        }
-
-        [Fact]
-        public async Task RegisterStudent_WithShortPassword_ReturnsBadRequest()
-        {
-            // Arrange
-            var registerDTO = new RegisterStudentDTO
-            {
-                Email = "test@example.com",
-                Password = "short",
-                Name = "Test User",
-                StudentNumber = "S123456",
-                DateOfBirth = new DateTime(2000, 1, 1),
-                StudyCity = City.Breda,
-            };
-
-            UserManager
-                .Setup(x => x.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()))
-                .ReturnsAsync(
-                    IdentityResult.Failed(
-                        new IdentityError { Description = "Password must be at least 8 characters" }
-                    )
-                );
-
-            // Act
-            var result = await _controller.RegisterStudent(registerDTO);
-
-            // Assert
-            var badRequestResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
-            var modelState = badRequestResult.Value as SerializableError;
-            modelState.Should().ContainKey(string.Empty);
-            _mockStudentRepository.Verify(x => x.CreateAsync(It.IsAny<Student>()), Times.Never);
-        }
-
-        [Fact]
-        public async Task RegisterStudent_WithUnderageStudent_ReturnsBadRequest()
-        {
-            // Arrange
-            var registerDTO = new RegisterStudentDTO
-            {
-                Email = "test@example.com",
-                Password = "ValidPass123!",
-                Name = "Test User",
-                StudentNumber = "S123456",
-                DateOfBirth = DateTime.Now.AddYears(-15), // 15 years old
-                StudyCity = City.Breda,
-            };
-
-            // Act
-            var result = await _controller.RegisterStudent(registerDTO);
-
-            // Assert
-            var badRequestResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
-            var modelState = badRequestResult.Value as SerializableError;
-            modelState!
-                [string.Empty]
-                .As<string[]>()
-                .Should()
-                .Contain(x => x.Contains("16 jaar") && x.Contains("toekomst"));
-            UserManager.Verify(
-                x => x.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()),
-                Times.Never
-            );
-            _mockStudentRepository.Verify(x => x.CreateAsync(It.IsAny<Student>()), Times.Never);
-        }
-
-        [Fact]
-        public async Task RegisterStudent_WithFutureBirthDate_ReturnsBadRequest()
-        {
-            // Arrange
-            var registerDTO = new RegisterStudentDTO
-            {
-                Email = "test@example.com",
-                Password = "ValidPass123!",
-                Name = "Test User",
-                StudentNumber = "S123456",
-                DateOfBirth = DateTime.Now.AddDays(1), // Future date
-                StudyCity = City.Breda,
-            };
-
-            // Act
-            var result = await _controller.RegisterStudent(registerDTO);
-
-            // Assert
-            var badRequestResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
-            var modelState = badRequestResult.Value as SerializableError;
-            modelState!
-                [string.Empty]
-                .As<string[]>()
-                .Should()
-                .Contain(x => x.Contains("16 jaar") && x.Contains("toekomst"));
-            UserManager.Verify(
-                x => x.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()),
-                Times.Never
-            );
-            _mockStudentRepository.Verify(x => x.CreateAsync(It.IsAny<Student>()), Times.Never);
+            _mockAuthService = new Mock<IAuthService>();
+            _controller = new AuthController(_mockAuthService.Object);
+            SetupController(_controller);
         }
 
         [Fact]
         public async Task RegisterStudent_WithValidData_ReturnsOkResult()
         {
             // Arrange
-            var registerDTO = new RegisterStudentDTO
+            var registerDto = new RegisterStudentDTO
             {
-                Email = "valid@example.com",
-                Password = "ValidPass123!",
-                Name = "Valid User",
-                StudentNumber = "S123456",
-                DateOfBirth = DateTime.Now.AddYears(-20),
-                StudyCity = City.Breda,
-                PhoneNumber = "1234567890",
+                Email = "test@example.com",
+                Password = "Password123!",
+                Name = "Test User",
             };
 
-            UserManager
-                .Setup(x => x.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()))
-                .ReturnsAsync(IdentityResult.Success);
-            UserManager
-                .Setup(x => x.AddToRoleAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()))
-                .ReturnsAsync(IdentityResult.Success);
-            _mockStudentRepository
-                .Setup(x => x.CreateAsync(It.IsAny<Student>()))
-                .ReturnsAsync(new Student());
+            _mockAuthService
+                .Setup(x => x.RegisterStudentAsync(registerDto))
+                .ReturnsAsync((true, null));
 
             // Act
-            var result = await _controller.RegisterStudent(registerDTO);
+            var result = await _controller.RegisterStudent(registerDto);
 
             // Assert
             result.Should().BeOfType<OkResult>();
-            _mockStudentRepository.Verify(x => x.CreateAsync(It.IsAny<Student>()), Times.Once);
+            _mockAuthService.Verify(x => x.RegisterStudentAsync(registerDto), Times.Once);
+        }
+
+        [Fact]
+        public async Task RegisterStudent_WithInvalidModel_ReturnsBadRequest()
+        {
+            // Arrange
+            var registerDto = new RegisterStudentDTO();
+            _controller.ModelState.AddModelError("Email", "Required");
+
+            // Act
+            var result = await _controller.RegisterStudent(registerDto);
+
+            // Assert
+            var badRequestResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
+            _mockAuthService.Verify(
+                x => x.RegisterStudentAsync(It.IsAny<RegisterStudentDTO>()),
+                Times.Never
+            );
         }
 
         [Fact]
         public async Task RegisterCanteenStaff_WithValidData_ReturnsOkResult()
         {
             // Arrange
-            var registerDTO = new RegisterCanteenStaffDTO
+            var registerDto = new RegisterCanteenStaffDTO
             {
                 Email = "staff@example.com",
-                Password = "ValidPass123!",
+                Password = "Password123!",
                 Name = "Staff User",
                 PersonnelNumber = "P123456",
                 CanteenId = 1,
             };
 
-            UserManager
-                .Setup(x => x.CreateAsync(It.IsAny<ApplicationUser>(), registerDTO.Password))
-                .ReturnsAsync(IdentityResult.Success);
-
-            UserManager
-                .Setup(x => x.AddToRoleAsync(It.IsAny<ApplicationUser>(), "CanteenStaff"))
-                .ReturnsAsync(IdentityResult.Success);
-
-            _mockCanteenStaffRepository
-                .Setup(x =>
-                    x.CreateAsync(
-                        It.Is<CanteenStaff>(cs =>
-                            cs.PersonnelNumber == registerDTO.PersonnelNumber
-                            && cs.CanteenId == registerDTO.CanteenId
-                        )
-                    )
-                )
-                .ReturnsAsync(new CanteenStaff());
+            _mockAuthService
+                .Setup(x => x.RegisterCanteenStaffAsync(registerDto))
+                .ReturnsAsync((true, null));
 
             // Act
-            var result = await _controller.RegisterCanteenStaff(registerDTO);
+            var result = await _controller.RegisterCanteenStaff(registerDto);
 
             // Assert
             result.Should().BeOfType<OkResult>();
-            _mockCanteenStaffRepository.Verify(
-                x => x.CreateAsync(It.IsAny<CanteenStaff>()),
-                Times.Once
+            _mockAuthService.Verify(x => x.RegisterCanteenStaffAsync(registerDto), Times.Once);
+        }
+
+        [Fact]
+        public async Task RegisterCanteenStaff_WithInvalidModel_ReturnsBadRequest()
+        {
+            // Arrange
+            var registerDto = new RegisterCanteenStaffDTO();
+            _controller.ModelState.AddModelError("Email", "Required");
+
+            // Act
+            var result = await _controller.RegisterCanteenStaff(registerDto);
+
+            // Assert
+            var badRequestResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
+            _mockAuthService.Verify(
+                x => x.RegisterCanteenStaffAsync(It.IsAny<RegisterCanteenStaffDTO>()),
+                Times.Never
             );
         }
 
         [Fact]
-        public async Task Login_WithValidCredentials_ReturnsOkResultWithUserInfo()
+        public async Task Login_WithValidCredentials_ReturnsOkResult()
         {
             // Arrange
-            var loginDTO = new LoginDTO { Email = "test@example.com", Password = "ValidPass123!" };
+            var loginDto = new LoginDTO { Email = "test@example.com", Password = "Password123!" };
+            var expectedResponse = new { Token = "jwt_token" };
 
-            var identityUser = new ApplicationUser
-            {
-                Id = "testId",
-                Email = loginDTO.Email,
-                UserName = loginDTO.Email,
-                Name = "Test User",
-            };
-
-            var birthday = DateTime.Now.AddYears(-20);
-            var student = new Student
-            {
-                Id = "testId",
-                DateOfBirth = birthday,
-                StudyCity = City.Breda,
-                StudentNumber = "S123456",
-            };
-
-            SignInManager
-                .Setup(x => x.PasswordSignInAsync(loginDTO.Email, loginDTO.Password, false, false))
-                .ReturnsAsync(Microsoft.AspNetCore.Identity.SignInResult.Success);
-
-            UserManager.Setup(x => x.FindByEmailAsync(loginDTO.Email)).ReturnsAsync(identityUser);
-
-            UserManager.Setup(x => x.GetRolesAsync(identityUser)).ReturnsAsync(["Student"]);
-
-            _mockStudentRepository.Setup(x => x.GetByIdAsync("testId")).ReturnsAsync(student);
+            _mockAuthService
+                .Setup(x => x.LoginAsync(loginDto))
+                .ReturnsAsync((true, expectedResponse, null));
 
             // Act
-            var result = await _controller.Login(loginDTO);
+            var result = await _controller.Login(loginDto);
 
             // Assert
             var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
-            okResult.Should().NotBeNull();
+            okResult.Value.Should().Be(expectedResponse);
+            _mockAuthService.Verify(x => x.LoginAsync(loginDto), Times.Once);
+        }
 
-            var value = okResult.Value.Should().BeAssignableTo<object>().Subject;
-            var json = JsonSerializer.Serialize(value);
-            var response = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(json);
+        [Fact]
+        public async Task Login_WithInvalidCredentials_ReturnsBadRequest()
+        {
+            // Arrange
+            var loginDto = new LoginDTO { Email = "test@example.com", Password = "WrongPassword" };
 
-            response.Should().ContainKey("responseData");
-            var responseData = response!["responseData"];
+            _mockAuthService
+                .Setup(x => x.LoginAsync(loginDto))
+                .ReturnsAsync((false, null, "Invalid credentials"));
 
-            responseData.TryGetProperty("Token", out JsonElement token);
-            token.GetString().Should().NotBeNullOrEmpty();
+            // Act
+            var result = await _controller.Login(loginDto);
 
-            responseData.TryGetProperty("Roles", out JsonElement rolesElement);
-            var roles = rolesElement.EnumerateArray().Select(r => r.GetString()).ToList();
-            roles.Should().Contain("Student");
-
-            if (response.ContainsKey("AdditionalData"))
-            {
-                var additionalData = response["AdditionalData"];
-                additionalData.TryGetProperty("StudyCity", out JsonElement city);
-                city.GetInt32().Should().Be((int)City.Breda);
-                additionalData.TryGetProperty("DateOfBirth", out JsonElement dateOfBirth);
-                dateOfBirth.GetDateTime().Should().Be(birthday);
-            }
+            // Assert
+            var badRequestResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
+            badRequestResult.Value.Should().Be("Invalid credentials");
+            _mockAuthService.Verify(x => x.LoginAsync(loginDto), Times.Once);
         }
     }
 }

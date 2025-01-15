@@ -1,13 +1,5 @@
-using System.Text;
 using FoodWasteReduction.Api.GraphQL;
 using FoodWasteReduction.Api.GraphQL.Types;
-using FoodWasteReduction.Core.Entities;
-using FoodWasteReduction.Infrastructure.Data;
-using FoodWasteReduction.Infrastructure.Identity;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 namespace FoodWasteReduction.Api.DependencyInjection
