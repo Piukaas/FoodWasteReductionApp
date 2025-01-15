@@ -1,4 +1,4 @@
-@using FoodWasteReduction.Core.Entities
+@using FoodWasteReduction.Application.DTOs.Json
 @using FoodWasteReduction.Core.Enums
 @using System.Text.Json.Nodes
 @model PackageViewModel
@@ -12,7 +12,7 @@
         userLocation = jsonObject?["CanteenId"]?.GetValue<int>() ?? 0;
     }
 
-    var userCanteen = (ViewData["Canteens"] as IEnumerable<Canteen>)?.FirstOrDefault(c =>
+    var userCanteen = (ViewData["Canteens"] as IEnumerable<JsonCanteenDTO>)?.FirstOrDefault(c =>
     (int)c.Id == userLocation);
 
     if (userCanteen != null)
@@ -100,8 +100,8 @@
                 <div class="mb-3">
                     <select asp-for="ProductIds" class="form-select form-select-lg" multiple size="10"
                         aria-label="Product selectie">
-                        @foreach (var product in ViewData["Products"] as IEnumerable<Product> ??
-                        Enumerable.Empty<Product>())
+                        @foreach (var product in ViewData["Products"] as IEnumerable<JsonProductDTO> ??
+                        Enumerable.Empty<JsonProductDTO>())
                         {
                             <option value="@product.Id">
                                 @product.Name @(product.ContainsAlcohol ? "(Alcohol)" : "")
