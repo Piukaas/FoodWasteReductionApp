@@ -2,7 +2,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using FoodWasteReduction.Application.DTOs.Json;
 using FoodWasteReduction.Web.Services.Interfaces;
-using Microsoft.AspNetCore.Http.Json;
 
 namespace FoodWasteReduction.Web.Services
 {

@@ -15,7 +15,6 @@ namespace FoodWasteReduction.Web.Controllers
             if (request == null)
                 return BadRequest("Invalid request data");
 
-            Console.WriteLine($"Reserving package with id: {request.PackageId}");
             var userData = HttpContext.Session.GetString("UserData");
 
             if (string.IsNullOrEmpty(userData))
