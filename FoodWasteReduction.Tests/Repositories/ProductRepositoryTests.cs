@@ -60,21 +60,5 @@ namespace FoodWasteReduction.Tests.Repositories
             result.Should().HaveCount(products.Count);
             result.Select(p => p.Id).Should().BeEquivalentTo(ids);
         }
-
-        [Fact]
-        public async Task GetProductsGraphQL_ReturnsAllProducts()
-        {
-            // Arrange
-            var products = await CreateTestProducts();
-
-            // Act
-            var result = _repository.GetProductsGraphQL();
-            result.Should().BeAssignableTo<IQueryable<Product>>();
-
-            // Assert
-            (await result.ToListAsync())
-                .Should()
-                .HaveCount(products.Count);
-        }
     }
 }

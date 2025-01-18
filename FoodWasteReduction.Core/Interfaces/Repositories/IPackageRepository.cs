@@ -12,6 +12,5 @@ namespace FoodWasteReduction.Core.Interfaces.Repositories
         Task<bool> HasReservationOnDateAsync(string userId, DateTime date);
         Task<Package?> GetPackageWithDetailsAsync(int packageId);
         Task<Package> ReservePackageAsync(Package package, string userId);
-        IQueryable<Package> GetPackagesGraphQL();
     }
 }

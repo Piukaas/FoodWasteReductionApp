@@ -20,10 +20,5 @@ namespace FoodWasteReduction.Infrastructure.Repositories
             await _context.SaveChangesAsync();
             return product;
         }
-
-        public IQueryable<Product> GetProductsGraphQL()
-        {
-            return _context.Products!;
-        }
     }
 }

@@ -99,16 +99,6 @@ namespace FoodWasteReduction.Tests.Repositories
         }
 
         [Fact]
-        public void GetPackagesGraphQL_ReturnsQueryable()
-        {
-            // Act
-            var result = _repository.GetPackagesGraphQL();
-
-            // Assert
-            result.Should().BeAssignableTo<IQueryable<Package>>();
-        }
-
-        [Fact]
         public async Task ReservePackageAsync_AlreadyReserved_UpdatesReservation()
         {
             // Arrange
