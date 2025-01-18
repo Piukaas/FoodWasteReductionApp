@@ -5,14 +5,9 @@ using FoodWasteReduction.Core.Interfaces.Repositories;
 
 namespace FoodWasteReduction.Application.Services
 {
-    public class CanteenService : ICanteenService
+    public class CanteenService(ICanteenRepository canteenRepository) : ICanteenService
     {
-        private readonly ICanteenRepository _canteenRepository;
-
-        public CanteenService(ICanteenRepository canteenRepository)
-        {
-            _canteenRepository = canteenRepository;
-        }
+        private readonly ICanteenRepository _canteenRepository = canteenRepository;
 
         public async Task<(bool success, CanteenDTO? canteen, string? error)> CreateAsync(
             CreateCanteenDTO dto
